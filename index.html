@@ -3,87 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Система Записи v4.0</title>
+    <title>Бронирование 24/15</title>
     <style>
-        :root { --p: #4f46e5; --d: #ef4444; --bg: #f3f4f6; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
-        body { background: var(--bg); color: #1f2937; padding: 15px; display: flex; justify-content: center; }
-        .app-card { width: 100%; max-width: 600px; background: white; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); overflow: hidden; position: relative; }
+        :root { 
+            --primary: #6366f1; 
+            --primary-dark: #4f46e5;
+            --danger: #ef4444; 
+            --success: #10b981;
+            --bg: #f8fafc; 
+            --card: #ffffff;
+            --text: #1e293b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
         
+        body { background: var(--bg); color: var(--text); padding: 15px; display: flex; justify-content: center; line-height: 1.5; }
+        
+        .app-container { width: 100%; max-width: 900px; background: var(--card); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.08); overflow: hidden; position: relative; }
+
         /* Loader */
-        #loader { position: absolute; inset: 0; background: rgba(255,255,255,0.9); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        .spin { width: 30px; height: 30px; border: 3px solid #e5e7eb; border-top-color: var(--p); border-radius: 50%; animation: s 0.6s linear infinite; }
-        @keyframes s { to { transform: rotate(360deg); } }
+        #loader { position: absolute; inset: 0; background: rgba(255,255,255,0.9); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .spinner { width: 45px; height: 45px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* UI Elements */
-        .header { background: #111827; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .content { padding: 20px; }
-        .btn { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: white; background: var(--p); transition: 0.2s; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-red { background: var(--d); }
-        
-        input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; margin-bottom: 15px; font-size: 16px; }
-        
-        .grid-ui { display: grid; gap: 20px; }
-        .time-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 8px; margin-top: 10px; }
-        .t-slot { padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; text-align: center; cursor: pointer; font-size: 14px; }
-        .t-slot.busy { background: #fee2e2; color: #991b1b; cursor: not-allowed; border-color: #fca5a5; }
-        .t-slot.selected { background: var(--p); color: white; border-color: var(--p); }
+        /* Header */
+        .header { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+        .sync-btn { background: rgba(255,255,255,0.1); border: none; color: white; width: 45px; height: 45px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .sync-btn:hover { background: rgba(255,255,255,0.2); transform: rotate(180deg); }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { text-align: left; font-size: 12px; color: #6b7280; padding-bottom: 8px; border-bottom: 2px solid #f3f4f6; }
-        td { padding: 12px 0; border-bottom: 1px solid #f3f4f6; font-size: 14px; }
-        
-        .del-x { color: var(--d); border: 1px solid var(--d); padding: 2px 6px; border-radius: 4px; background: none; cursor: pointer; font-weight: bold; }
-        .admin-box { background: #fff7ed; border: 1px dashed #ed8936; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+        .content { padding: 30px; }
+
+        /* Формы */
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #64748b; text-transform: uppercase; }
+        input, select { width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px; margin-bottom: 20px; font-size: 16px; transition: 0.2s; outline: none; background: #f1f5f9; }
+        input:focus, select:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        /* Сетка времени */
+        .time-label { margin-top: 10px; }
+        .time-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); 
+            gap: 8px; 
+            max-height: 300px; 
+            overflow-y: auto; 
+            padding: 10px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            margin-bottom: 25px;
+        }
+        .slot { padding: 10px 5px; background: white; border: 1px solid #cbd5e1; border-radius: 8px; text-align: center; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; }
+        .slot:hover:not(.busy) { border-color: var(--primary); color: var(--primary); }
+        .slot.selected { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+        .slot.busy { background: #fee2e2; color: #991b1b; cursor: not-allowed; border-color: #fecaca; opacity: 0.7; }
+
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
+        .btn-red { background: #fff1f2; color: var(--danger); border: 1px solid #fecaca; }
+        .btn-red:hover { background: var(--danger); color: white; }
+
+        /* Таблица */
+        .table-container { margin-top: 40px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 500px; }
+        th { text-align: left; padding: 15px; font-size: 12px; color: #64748b; border-bottom: 2px solid #f1f5f9; text-transform: uppercase; }
+        td { padding: 18px 15px; border-bottom: 1px solid #f1f5f9; font-size: 15px; }
+        .row-time { font-weight: 700; color: var(--text); }
+        .row-user { color: #475569; }
+
+        .badge-admin { background: #fff7ed; color: #c2410c; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; border: 1px solid #ffedd5; margin-left: 10px; }
+
+        .del-btn { width: 35px; height: 35px; border-radius: 8px; border: 1px solid #fecaca; background: #fff1f2; color: var(--danger); cursor: pointer; transition: 0.2s; font-weight: bold; }
+        .del-btn:hover { background: var(--danger); color: white; }
+
+        .admin-section { background: #fff7ed; border: 2px dashed #fb923c; border-radius: 20px; padding: 20px; margin-bottom: 30px; }
+
+        @media (max-width: 600px) {
+            .form-row { grid-template-columns: 1fr; }
+            .header h1 { font-size: 18px; }
+            .content { padding: 20px; }
+        }
     </style>
 </head>
 <body>
 
-<div class="app-card">
-    <div id="loader"><div class="spin"></div><p style="margin-top:10px">Связь с сервером...</p></div>
+<div class="app-container">
+    <div id="loader"><div class="spinner"></div><p style="margin-top:15px; font-weight: 600;">Загрузка...</p></div>
 
     <div class="header">
-        <h2 style="font-size: 18px;">📅 Lesson Booking</h2>
-        <button onclick="App.sync()" style="background:none; border:none; color:white; cursor:pointer; font-size:20px;">🔄</button>
+        <h1>📅 Lesson Planning <span id="adm-badge" class="badge-admin" style="display:none">ADMIN</span></h1>
+        <button class="sync-btn" onclick="App.sync()">🔄</button>
     </div>
 
     <div id="view-login" class="content">
-        <label>Введите ваше имя:</label>
-        <input type="text" id="in-name" placeholder="Иван Иванов">
-        <button class="btn" style="width:100%" onclick="App.login()">Войти в систему</button>
-        <button onclick="localStorage.clear(); location.reload();" style="margin-top:20px; background:none; border:none; color:#9ca3af; width:100%; font-size:12px;">Очистить кэш (если не грузит)</button>
+        <label>Ваше Имя</label>
+        <input type="text" id="in-name" placeholder="Введите имя для записи...">
+        <button class="btn btn-primary" onclick="App.login()">Войти в систему</button>
     </div>
 
     <div id="view-main" class="content" style="display:none">
-        <div id="admin-tools" style="display:none" class="admin-box">
-            <p style="font-size:13px; color:#c2410c; margin-bottom:10px;">⚡ ПАНЕЛЬ АДМИНИСТРАТОРА</p>
-            <button class="btn btn-red" style="width:100%; font-size:13px;" onclick="App.clearAll()">Удалить ВООБЩЕ ВСЕ записи</button>
-        </div>
-
-        <div class="grid-ui">
-            <div>
-                <label>1. Выберите дату:</label>
-                <input type="date" id="in-date" onchange="App.render()">
-                
-                <label>2. Время:</label>
-                <div id="time-container" class="time-grid"></div>
-                
-                <button id="btn-book" class="btn" style="width:100%; margin-top:20px;" onclick="App.book()" disabled>Записаться</button>
-            </div>
-
-            <hr style="border:0; border-top:1px solid #eee">
-
-            <div>
-                <h4>Записи на выбранный день:</h4>
-                <table id="res-table">
-                    <thead><tr><th>Время</th><th>Ученик</th><th class="adm-only" style="display:none">Уд.</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
         
-        <button onclick="App.logout()" style="margin-top:30px; width:100%; background:none; border:none; color:#9ca3af; cursor:pointer;">← Выйти из аккаунта</button>
+        <div id="admin-panel" class="admin-section" style="display:none">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <span style="font-weight: 800; color: #c2410c;">УПРАВЛЕНИЕ БАЗОЙ</span>
+                <button class="btn btn-red" style="width: auto; padding: 8px 15px; font-size: 12px;" onclick="App.clearAll()">Удалить всё</button>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div>
+                <label>Дата занятия</label>
+                <input type="date" id="in-date" onchange="App.render()">
+            </div>
+            <div>
+                <label>Длительность</label>
+                <select id="in-duration" onchange="App.render()">
+                    <option value="15">15 минут</option>
+                    <option value="30">30 минут</option>
+                    <option value="45">45 минут</option>
+                    <option value="60" selected>1 час</option>
+                    <option value="90">1.5 часа</option>
+                    <option value="120">2 часа</option>
+                    <option value="180">3 часа</option>
+                </select>
+            </div>
+        </div>
+
+        <label class="time-label">Выберите время начала (00:00 - 23:45)</label>
+        <div id="time-grid" class="time-grid"></div>
+
+        <button id="btn-book" class="btn btn-primary" onclick="App.book()" disabled>Забронировать выбранное время</button>
+
+        <div class="table-container">
+            <label>Расписание на выбранный день</label>
+            <table id="res-table">
+                <thead>
+                    <tr>
+                        <th>Время занятия</th>
+                        <th>Имя ученика</th>
+                        <th class="adm-only" style="display:none">Действие</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <button onclick="App.logout()" style="margin-top:40px; width:100%; background:none; border:none; color:#94a3b8; cursor:pointer; font-size: 14px; text-decoration: underline;">Выйти (сменить пользователя)</button>
     </div>
 </div>
 
@@ -98,7 +167,7 @@ const App = {
     db: [],
     user: localStorage.getItem('u_name'),
     isAdmin: localStorage.getItem('u_admin') === 'true',
-    selTime: null,
+    selTime: null, // Время начала в минутах от начала дня (0 - 1425)
 
     async init() {
         document.getElementById('in-date').valueAsDate = new Date();
@@ -112,12 +181,9 @@ const App = {
             const res = await fetch(`https://api.jsonbin.io/v3/b/${CFG.BIN}/latest`, {
                 headers: { 'X-Master-Key': CFG.KEY, 'X-Bin-Meta': 'false' }
             });
-            if (!res.ok) throw 'Err';
             const data = await res.json();
             this.db = Array.isArray(data) ? data : [];
-        } catch (e) {
-            console.error("Сетевая ошибка, работаем локально");
-        }
+        } catch (e) { console.error("Связь потеряна"); }
         this.render();
         this.toggleL(false);
     },
@@ -125,18 +191,14 @@ const App = {
     async save(newDb) {
         this.toggleL(true);
         try {
-            const res = await fetch(`https://api.jsonbin.io/v3/b/${CFG.BIN}`, {
+            await fetch(`https://api.jsonbin.io/v3/b/${CFG.BIN}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'X-Master-Key': CFG.KEY },
                 body: JSON.stringify(newDb)
             });
-            if (res.ok) {
-                this.db = newDb;
-                this.render();
-            }
-        } catch (e) {
-            alert("Не удалось сохранить на сервер!");
-        }
+            this.db = newDb;
+            this.render();
+        } catch (e) { alert("Ошибка записи в облако"); }
         this.toggleL(false);
     },
 
@@ -144,7 +206,7 @@ const App = {
         const n = document.getElementById('in-name').value.trim();
         if (!n) return;
         if (n.toLowerCase() === 'admin') {
-            if (prompt('Пароль администратора:') !== CFG.PASS) return alert('Неверно');
+            if (prompt('Ключ администратора:') !== CFG.PASS) return alert('Доступ запрещен');
             this.isAdmin = true;
         }
         this.user = n;
@@ -159,60 +221,89 @@ const App = {
         document.getElementById('view-login').style.display = 'none';
         document.getElementById('view-main').style.display = 'block';
         if (this.isAdmin) {
-            document.getElementById('admin-tools').style.display = 'block';
+            document.getElementById('admin-panel').style.display = 'block';
+            document.getElementById('adm-badge').style.display = 'inline-block';
             document.querySelectorAll('.adm-only').forEach(el => el.style.display = 'table-cell');
         }
     },
 
     book() {
         const date = document.getElementById('in-date').value;
-        const entry = { id: Date.now(), d: date, t: this.selTime, u: this.user };
-        const updated = [...this.db, entry];
-        this.save(updated);
+        const dur = parseInt(document.getElementById('in-duration').value);
+        this.db.push({
+            id: Date.now(),
+            d: date,
+            start: this.selTime,
+            end: this.selTime + dur,
+            u: this.user
+        });
+        this.save(this.db);
         this.selTime = null;
     },
 
-    deleteSingle(id) {
-        if (!confirm('Удалить эту конкретную запись?')) return;
-        const updated = this.db.filter(x => x.id !== id);
-        this.save(updated);
+    deleteRow(id) {
+        if (confirm('Удалить эту анкету?')) this.save(this.db.filter(x => x.id !== id));
     },
 
     clearAll() {
-        if (!confirm('Вы уверены? Это сотрет ВСЕ записи в базе!')) return;
-        this.save([]);
+        if (confirm('ВНИМАНИЕ: База данных будет полностью очищена. Продолжить?')) this.save([]);
+    },
+
+    // Помощник для перевода минут в формат 00:00
+    formatTime(minutes) {
+        const h = Math.floor(minutes / 60);
+        const m = minutes % 60;
+        return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
     },
 
     render() {
         const date = document.getElementById('in-date').value;
-        
-        // Время
-        const cont = document.getElementById('time-container');
+        const dur = parseInt(document.getElementById('in-duration').value);
+        const cont = document.getElementById('time-grid');
         cont.innerHTML = '';
-        for (let h = 8; h <= 21; h++) {
-            const time = `${h}:00`;
-            const isBusy = this.db.some(x => x.d === date && x.t === time);
+        
+        // 1. Собираем занятые интервалы на этот день
+        const busyRanges = this.db.filter(x => x.d === date);
+
+        // 2. Генерируем слоты каждые 15 мин (от 0 до 1440 минут в сутках)
+        for (let m = 0; m < 1440; m += 15) {
+            const timeStr = this.formatTime(m);
+            const myEnd = m + dur;
+            
+            // Проверка: занято ли это время или пересекается ли оно с существующей записью
+            const isBusy = busyRanges.some(x => (m < x.end && myEnd > x.start));
+            
+            // Проверка: не выходит ли занятие за границы текущих суток
+            const isOverday = myEnd > 1440;
+
             const d = document.createElement('div');
-            d.className = `t-slot ${isBusy ? 'busy' : ''} ${this.selTime === time ? 'selected' : ''}`;
-            d.textContent = time;
-            if (!isBusy) d.onclick = () => { this.selTime = time; this.render(); };
+            d.className = `slot ${isBusy || isOverday ? 'busy' : ''} ${this.selTime === m ? 'selected' : ''}`;
+            d.textContent = timeStr;
+            
+            if (!isBusy && !isOverday) {
+                d.onclick = () => { this.selTime = m; this.render(); };
+            }
             cont.appendChild(d);
         }
-        document.getElementById('btn-book').disabled = !this.selTime;
+        
+        document.getElementById('btn-book').disabled = (this.selTime === null);
 
-        // Таблица
+        // 3. Таблица
         const tbody = document.querySelector('#res-table tbody');
         tbody.innerHTML = '';
-        const dayList = this.db.filter(x => x.d === date).sort((a,b) => a.t.localeCompare(b.t));
+        const dayList = this.db.filter(x => x.d === date).sort((a,b) => a.start - b.start);
         
         if(dayList.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" style="color:#999; text-align:center">Нет записей</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#94a3b8; padding:30px;">На этот день записей пока нет</td></tr>';
         }
 
         dayList.forEach(x => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td><b>${x.t}</b></td><td>${x.u}</td>
-            ${this.isAdmin ? `<td><button class="del-x" onclick="App.deleteSingle(${x.id})">×</button></td>` : ''}`;
+            tr.innerHTML = `
+                <td class="row-time">${this.formatTime(x.start)} — ${this.formatTime(x.end)}</td>
+                <td class="row-user">${x.u}</td>
+                ${this.isAdmin ? `<td><button class="del-btn" onclick="App.deleteRow(${x.id})">×</button></td>` : ''}
+            `;
             tbody.appendChild(tr);
         });
     },

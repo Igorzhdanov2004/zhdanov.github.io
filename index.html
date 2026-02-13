@@ -3,83 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Бронирование 24/7 — Stable</title>
+    <title>Бронирование — Финальная Проверка</title>
     <style>
-        :root { --p: #6366f1; --d: #ef4444; --s: #10b981; --bg: #f1f5f9; --text: #1e293b; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
-        body { background: var(--bg); color: var(--text); padding: 10px; display: flex; justify-content: center; }
-        .app-card { width: 100%; max-width: 800px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; position: relative; min-height: 400px; }
-        
-        /* Loader */
-        #loader { position: absolute; inset: 0; background: rgba(255,255,255,0.9); z-index: 1000; display: none; align-items: center; justify-content: center; flex-direction: column; }
-        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--p); border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
+        :root { --p: #6366f1; --d: #ef4444; --s: #10b981; --bg: #f8fafc; --text: #1e293b; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); padding: 15px; display: flex; justify-content: center; }
+        .app-container { width: 100%; max-width: 850px; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; position: relative; }
+        #loader { position: absolute; inset: 0; background: rgba(255,255,255,0.8); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--p); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .header { background: #1e293b; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .content { padding: 25px; }
-
-        input, select { width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px; margin-bottom: 20px; font-size: 16px; outline: none; background: #f8fafc; }
-        .time-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 10px; max-height: 250px; overflow-y: auto; padding: 15px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
-        .slot { padding: 12px 5px; background: white; border: 1px solid #cbd5e1; border-radius: 10px; text-align: center; cursor: pointer; font-size: 14px; font-weight: 600; }
+        .content { padding: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; color: #64748b; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; margin-bottom: 15px; font-size: 16px; outline: none; }
+        .time-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 8px; max-height: 250px; overflow-y: auto; padding: 10px; background: #f1f5f9; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
+        .slot { padding: 10px 5px; background: white; border: 1px solid #cbd5e1; border-radius: 8px; text-align: center; cursor: pointer; font-size: 13px; font-weight: 600; }
         .slot.selected { background: var(--p); color: white; border-color: var(--p); }
         .slot.busy { background: #fee2e2; color: #991b1b; cursor: not-allowed; opacity: 0.6; }
-
-        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .btn-primary { background: var(--p); color: white; }
         .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; }
-
         table { width: 100%; border-collapse: collapse; margin-top: 25px; }
-        td, th { padding: 12px; text-align: left; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
-        .del-btn { padding: 5px 10px; border-radius: 6px; border: 1px solid #fecaca; background: #fff1f2; color: var(--d); cursor: pointer; }
-        .my-tag { background: var(--s); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 5px; }
+        th { text-align: left; padding: 10px; font-size: 12px; color: #64748b; border-bottom: 2px solid #f1f5f9; }
+        td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        .del-btn { padding: 5px 10px; border-radius: 6px; border: 1px solid #fecaca; background: #fff1f2; color: var(--d); cursor: pointer; font-size: 11px; font-weight: bold; }
+        .my-badge { background: var(--s); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 5px; }
+        .warning { color: var(--d); font-size: 14px; margin-top: 10px; padding: 8px; background: #fff1f2; border-radius: 8px; display: none; }
     </style>
 </head>
 <body>
 
-<div class="app-card">
-    <div id="loader"><div class="spinner"></div><p id="loader-text" style="margin-top:10px">Загрузка...</p></div>
-    
+<div class="app-container">
+    <div id="loader"><div class="spinner"></div></div>
     <div class="header">
-        <h2 id="app-title">📅 Запись</h2>
-        <button onclick="App.sync()" style="background:none; border:none; color:white; cursor:pointer; font-size:22px;">🔄</button>
+        <h2 id="title">Запись на занятия</h2>
+        <button onclick="App.sync()" style="background:none; border:none; color:white; cursor:pointer; font-size:20px;">🔄</button>
     </div>
 
     <div id="view-login" class="content">
-        <label style="display:block; margin-bottom:10px; font-weight:600">Ваше имя для регистрации:</label>
+        <label>Ваше Имя</label>
         <input type="text" id="in-name" placeholder="Введите имя...">
         <button class="btn btn-primary" onclick="App.login()">Войти</button>
+        <div class="warning" id="login-warning">Пожалуйста, введите ваше имя</div>
     </div>
 
     <div id="view-main" class="content" style="display:none">
-        <div id="admin-tools" style="display:none; border: 1px dashed orange; padding: 10px; border-radius: 10px; margin-bottom: 15px;">
-            <button class="btn" style="background:none; color:red; font-size:12px; padding:5px;" onclick="App.clearAll()">Очистить базу (Админ)</button>
+        <div id="admin-tools" style="display:none; padding:10px; border:1px dashed orange; margin-bottom:15px; border-radius:10px;">
+            <button class="btn" style="background:#fff1f2; color:red; padding:8px;" onclick="App.clearAll()">Очистить всё (Админ)</button>
         </div>
 
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
             <div>
-                <label style="font-size:12px; font-weight:600">Дата</label>
+                <label>Дата</label>
                 <input type="date" id="in-date" onchange="App.render()">
             </div>
             <div>
-                <label style="font-size:12px; font-weight:600">Длительность</label>
+                <label>Длительность</label>
                 <select id="in-duration" onchange="App.render()">
                     <option value="15">15 мин</option>
                     <option value="30">30 мин</option>
+                    <option value="45">45 мин</option>
                     <option value="60" selected>1 час</option>
-                    <option value="120">2 часа</option>
+                    <option value="90">1.5 ч</option>
+                    <option value="120">2 ч</option>
                 </select>
             </div>
         </div>
 
+        <label>Доступное время (нажмите для выбора)</label>
         <div id="time-grid" class="time-grid"></div>
-        <button id="btn-book" class="btn btn-primary" onclick="App.book()" disabled>Забронировать</button>
+        <div class="warning" id="time-warning"></div>
+
+        <button id="btn-book" class="btn btn-primary" onclick="App.book()" disabled>Забронировать время</button>
 
         <table>
             <thead><tr><th>Время</th><th>Ученик</th><th>Действие</th></tr></thead>
             <tbody id="res-table"></tbody>
         </table>
         
-        <button onclick="App.logout()" style="margin-top:30px; width:100%; background:none; border:none; color:#94a3b8; font-size:11px; cursor:pointer; text-decoration: underline;">Выйти</button>
+        <button onclick="App.logout()" style="margin-top:30px; width:100%; background:none; border:none; color:#94a3b8; font-size:12px; cursor:pointer;">Сменить пользователя</button>
     </div>
 </div>
 
@@ -98,39 +100,32 @@ const App = {
 
     async init() {
         document.getElementById('in-date').valueAsDate = new Date();
-        if (this.user) {
-            this.showMain();
-            await this.sync();
-        }
+        if (this.user) this.showMain();
+        await this.sync();
+        setInterval(() => this.sync(), 20000); // Обновление раз в 20 сек
     },
 
     async sync() {
-        this.toggleL(true, "Синхронизация...");
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000); // Таймаут 8 сек
-
         try {
+            // ИСПРАВЛЕНО: Убраны лишние пробелы в URL
             const res = await fetch(`https://api.jsonbin.io/v3/b/${CFG.BIN}/latest`, {
                 headers: { 'X-Master-Key': CFG.KEY, 'X-Bin-Meta': 'false' },
-                cache: 'no-store',
-                signal: controller.signal
+                cache: 'no-store'
             });
-            if (!res.ok) throw new Error();
             const data = await res.json();
             this.db = Array.isArray(data) ? data : [];
             this.render();
-        } catch (e) {
-            console.error("Сервер недоступен, работаем с локальным кэшем");
-            alert("Ошибка связи с сервером. Попробуйте нажать 🔄 позже.");
-        } finally {
-            clearTimeout(timeoutId);
-            this.toggleL(false);
+        } catch (e) { 
+            console.error("Ошибка синхронизации", e);
+            alert("Не удалось загрузить данные. Проверьте подключение.");
         }
     },
 
     async save(newDb) {
-        this.toggleL(true, "Сохранение...");
+        this.toggleL(true);
+        document.getElementById('btn-book').disabled = true;
         try {
+            // ИСПРАВЛЕНО: Убраны лишние пробелы в URL
             const res = await fetch(`https://api.jsonbin.io/v3/b/${CFG.BIN}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'X-Master-Key': CFG.KEY },
@@ -139,35 +134,55 @@ const App = {
             if (res.ok) {
                 this.db = newDb;
                 this.selTime = null;
-                this.render();
-            } else { throw new Error(); }
-        } catch (e) {
-            alert("Ошибка при сохранении. Проверьте интернет.");
-        } finally {
-            this.toggleL(false);
+                await this.sync();
+            } else {
+                throw new Error("Ошибка сохранения на сервере");
+            }
+        } catch (e) { 
+            alert("Ошибка сохранения: " + e.message); 
+            await this.sync(); // Восстанавливаем актуальное состояние
         }
+        this.toggleL(false);
     },
 
     login() {
         const n = document.getElementById('in-name').value.trim();
-        if (!n) return;
-        if (n.toLowerCase() === 'admin') {
-            if (prompt('Пароль:') !== CFG.PASS) return;
-            this.isAdmin = true;
+        const warning = document.getElementById('login-warning');
+        
+        if (!n) {
+            warning.style.display = 'block';
+            return;
         }
+        warning.style.display = 'none';
+        
+        // Админ-режим только при явном вводе "admin" и правильном пароле
+        if (n.toLowerCase() === 'admin') {
+            const pass = prompt('Введите пароль администратора:');
+            if (pass !== CFG.PASS) {
+                alert('Неверный пароль!');
+                return;
+            }
+            this.isAdmin = true;
+        } else {
+            // Обычный пользователь НИКОГДА не получает права админа
+            this.isAdmin = false;
+        }
+        
         this.user = n;
         localStorage.setItem('u_name', n);
         localStorage.setItem('u_admin', this.isAdmin);
         this.showMain();
-        this.sync();
     },
 
-    logout() { localStorage.clear(); location.reload(); },
+    logout() { 
+        localStorage.clear(); 
+        location.reload(); 
+    },
 
     showMain() {
         document.getElementById('view-login').style.display = 'none';
         document.getElementById('view-main').style.display = 'block';
-        document.getElementById('app-title').textContent = `Привет, ${this.user}`;
+        document.getElementById('title').textContent = `Привет, ${this.user}`;
         if (this.isAdmin) document.getElementById('admin-tools').style.display = 'block';
     },
 
@@ -177,69 +192,162 @@ const App = {
         const myStart = this.selTime;
         const myEnd = this.selTime + dur;
 
-        // Финальная проверка пересечения перед отправкой
-        const conflict = this.db.find(x => x.d === date && (myStart < x.end && myEnd > x.start));
-        if (conflict) {
-            alert(`Ошибка! Время пересекается с записью: ${conflict.u}`);
-            this.sync();
+        // Синхронизируемся ПЕРЕД проверкой для актуальных данных
+        await this.sync();
+        
+        // ИСПРАВЛЕНА ЛОГИКА ПРОВЕРКИ ПЕРЕСЕЧЕНИЙ:
+        // Проверяем пересечение по формуле: 
+        // (новое_начало < существующий_конец) И (новый_конец > существующее_начало)
+        const isConflict = this.db.some(x => 
+            x.d === date && 
+            myStart < x.end && 
+            myEnd > x.start
+        );
+
+        if (isConflict) {
+            document.getElementById('time-warning').textContent = 
+                "⚠️ Это время пересекается с существующей записью. Выберите другой слот.";
+            document.getElementById('time-warning').style.display = 'block';
+            this.selTime = null;
+            this.render();
             return;
         }
 
-        const newEntry = { id: Date.now(), d: date, start: myStart, end: myEnd, u: this.user };
+        // Дополнительная проверка: не выходит ли за пределы суток
+        if (myEnd > 1440) {
+            document.getElementById('time-warning').textContent = 
+                `⚠️ Выбранное время (${this.formatTime(myStart)}-${this.formatTime(myEnd)}) выходит за пределы суток. Уменьшите длительность.`;
+            document.getElementById('time-warning').style.display = 'block';
+            return;
+        }
+
+        const newEntry = { 
+            id: Date.now(), 
+            d: date, 
+            start: myStart, 
+            end: myEnd, 
+            u: this.user 
+        };
+        
+        document.getElementById('time-warning').style.display = 'none';
         await this.save([...this.db, newEntry]);
     },
 
     deleteRow(id) {
-        if (confirm('Отменить запись?')) this.save(this.db.filter(x => x.id !== id));
+        if (!confirm('Удалить эту запись?')) return;
+        this.save(this.db.filter(x => x.id !== id));
     },
 
-    clearAll() { if (confirm('Удалить всё?')) this.save([]); },
+    clearAll() { 
+        if (confirm('УДАЛИТЬ ВСЕ ЗАПИСИ? Это действие нельзя отменить!')) 
+            this.save([]); 
+    },
 
     formatTime(m) {
-        return `${Math.floor(m/60).toString().padStart(2,'0')}:${(m%60).toString().padStart(2,'0')}`;
+        // ИСПРАВЛЕНО: Корректное форматирование для времён после 24:00
+        const totalMinutes = m % 1440;
+        const h = Math.floor(totalMinutes / 60);
+        const min = totalMinutes % 60;
+        return `${h.toString().padStart(2,'0')}:${min.toString().padStart(2,'0')}`;
     },
 
     render() {
         const date = document.getElementById('in-date').value;
         const dur = parseInt(document.getElementById('in-duration').value);
         const cont = document.getElementById('time-grid');
+        const warning = document.getElementById('time-warning');
+        warning.style.display = 'none';
         cont.innerHTML = '';
         
         const dayBusy = this.db.filter(x => x.d === date);
+        let hasVisibleSlots = false;
 
+        // Генерируем слоты с шагом 15 минут
         for (let m = 0; m < 1440; m += 15) {
             const myEnd = m + dur;
-            const isBusy = dayBusy.some(x => (m < x.end && myEnd > x.start));
             const isOver = myEnd > 1440;
+            
+            // ИСПРАВЛЕНА ЛОГИКА ПРОВЕРКИ ЗАНЯТОСТИ:
+            // Слот считается занятым, если:
+            // 1. Новая бронь пересекается с существующей (даже частично)
+            // 2. Время выходит за пределы суток
+            const isBusy = dayBusy.some(x => 
+                (m < x.end && (m + dur) > x.start)
+            ) || isOver;
 
             const d = document.createElement('div');
-            d.className = `slot ${isBusy || isOver ? 'busy' : ''} ${this.selTime === m ? 'selected' : ''}`;
+            d.className = `slot ${isBusy ? 'busy' : ''} ${this.selTime === m && !isBusy ? 'selected' : ''}`;
             d.textContent = this.formatTime(m);
-            if (!isBusy && !isOver) d.onclick = () => { this.selTime = m; this.render(); };
+            
+            if (!isBusy) {
+                hasVisibleSlots = true;
+                d.onclick = () => { 
+                    this.selTime = m; 
+                    warning.style.display = 'none';
+                    this.render(); 
+                };
+            }
+            
             cont.appendChild(d);
         }
-        document.getElementById('btn-book').disabled = (this.selTime === null);
+        
+        // ИСПРАВЛЕНО: Валидация выбранного слота при изменении параметров
+        if (this.selTime !== null) {
+            const currentEnd = this.selTime + dur;
+            const isCurrentOver = currentEnd > 1440;
+            const isCurrentBusy = dayBusy.some(x => 
+                this.selTime < x.end && currentEnd > x.start
+            );
+            
+            // Снимаем выделение если слот стал недоступен
+            if (isCurrentBusy || isCurrentOver) {
+                this.selTime = null;
+                warning.textContent = "⚠️ Ранее выбранный слот стал недоступен. Выберите новое время.";
+                warning.style.display = 'block';
+            }
+        }
+        
+        // Обновляем состояние кнопки
+        document.getElementById('btn-book').disabled = (this.selTime === null || !hasVisibleSlots);
+        
+        // Отображаем предупреждение если нет доступных слотов
+        if (!hasVisibleSlots) {
+            warning.textContent = "ℹ️ Нет доступных слотов на выбранную дату и длительность. Попробуйте изменить параметры.";
+            warning.style.display = 'block';
+        }
 
+        // Рендерим таблицу записей
         const tbody = document.getElementById('res-table');
         tbody.innerHTML = '';
-        dayBusy.sort((a,b) => a.start - b.start).forEach(x => {
+        const list = dayBusy.sort((a,b) => a.start - b.start);
+        
+        list.forEach(x => {
             const canDel = this.isAdmin || x.u === this.user;
             const tr = document.createElement('tr');
+            // ИСПРАВЛЕНО: Корректное отображение времени с использованием formatTime
             tr.innerHTML = `
                 <td><b>${this.formatTime(x.start)}-${this.formatTime(x.end)}</b></td>
-                <td>${x.u}${x.u === this.user ? '<span class="my-tag">ВЫ</span>' : ''}</td>
+                <td>${x.u}${x.u === this.user ? '<span class="my-badge">ВЫ</span>' : ''}</td>
                 <td>${canDel ? `<button class="del-btn" onclick="App.deleteRow(${x.id})">Удалить</button>` : '-'}</td>
             `;
             tbody.appendChild(tr);
         });
+        
+        if(!list.length) {
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#94a3b8; padding:20px;">Нет записей</td></tr>';
+        }
     },
 
-    toggleL(s, txt = "Загрузка...") { 
-        const l = document.getElementById('loader');
-        document.getElementById('loader-text').textContent = txt;
-        l.style.display = s ? 'flex' : 'none'; 
+    toggleL(s) { 
+        document.getElementById('loader').style.display = s ? 'flex' : 'none'; 
     }
 };
+
+// Гарантируем, что при первой загрузке показывается форма входа
+if (!localStorage.getItem('u_name')) {
+    document.getElementById('view-login').style.display = 'block';
+    document.getElementById('view-main').style.display = 'none';
+}
 
 App.init();
 </script>

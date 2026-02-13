@@ -2,588 +2,222 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>📚 Запись на занятия (v3)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система Записи v4.0</title>
     <style>
-        :root {
-            --bg-body: #f3f4f6;
-            --bg-card: #ffffff;
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --danger: #ef4444;
-            --danger-hover: #dc2626;
-            --text-main: #111827;
-            --text-sub: #6b7280;
-            --border: #e5e7eb;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-
-        body {
-            background: var(--bg-body);
-            color: var(--text-main);
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 900px;
-            background: var(--bg-card);
-            border-radius: 20px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* --- Шапка --- */
-        .header {
-            background: #1f2937;
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .header h1 { font-size: 1.25rem; font-weight: 700; }
-        .refresh-btn {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.85rem;
-        }
-        .refresh-btn:hover { background: rgba(255,255,255,0.2); }
-
-        /* --- Вход --- */
-        .auth-screen {
-            padding: 40px 20px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-        .input-std {
-            padding: 12px;
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            width: 100%;
-            max-width: 300px;
-            font-size: 1rem;
-        }
-        .btn {
-            padding: 12px 24px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .btn:hover { background: var(--primary-hover); }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-        /* --- Основной интерфейс --- */
-        .app-screen { display: none; padding: 20px; }
+        :root { --p: #4f46e5; --d: #ef4444; --bg: #f3f4f6; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
+        body { background: var(--bg); color: #1f2937; padding: 15px; display: flex; justify-content: center; }
+        .app-card { width: 100%; max-width: 600px; background: white; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); overflow: hidden; position: relative; }
         
-        .user-panel {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border);
-        }
+        /* Loader */
+        #loader { position: absolute; inset: 0; background: rgba(255,255,255,0.9); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .spin { width: 30px; height: 30px; border: 3px solid #e5e7eb; border-top-color: var(--p); border-radius: 50%; animation: s 0.6s linear infinite; }
+        @keyframes s { to { transform: rotate(360deg); } }
+
+        /* UI Elements */
+        .header { background: #111827; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .content { padding: 20px; }
+        .btn { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: white; background: var(--p); transition: 0.2s; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-red { background: var(--d); }
         
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1.2fr;
-            gap: 25px;
-        }
-        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
-
-        /* Карточка записи */
-        .card { padding: 20px; border: 1px solid var(--border); border-radius: 16px; background: #fff; }
-        .card h3 { margin-bottom: 15px; font-size: 1.1rem; }
-
-        .time-slots {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
-            gap: 8px;
-            max-height: 250px;
-            overflow-y: auto;
-            margin-top: 10px;
-        }
-        .slot {
-            padding: 8px 4px;
-            text-align: center;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-        .slot:hover:not(.busy) { border-color: var(--primary); background: #eef2ff; }
-        .slot.selected { background: var(--primary); color: white; border-color: var(--primary); }
-        .slot.busy { background: #fee2e2; color: #991b1b; border-color: #fca5a5; opacity: 0.6; cursor: not-allowed; }
-        .slot.mine { background: #d1fae5; color: #065f46; border-color: #34d399; cursor: not-allowed; }
-
-        /* Таблица */
-        .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        th { background: #f9fafb; padding: 12px; text-align: left; font-weight: 600; color: var(--text-sub); }
-        td { padding: 12px; border-top: 1px solid var(--border); vertical-align: middle; }
+        input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; margin-bottom: 15px; font-size: 16px; }
         
-        .del-btn {
-            background: #fee2e2;
-            color: #dc2626;
-            border: 1px solid #fca5a5;
-            width: 30px;
-            height: 30px;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            transition: 0.2s;
-        }
-        .del-btn:hover { background: #dc2626; color: white; }
+        .grid-ui { display: grid; gap: 20px; }
+        .time-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 8px; margin-top: 10px; }
+        .t-slot { padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; text-align: center; cursor: pointer; font-size: 14px; }
+        .t-slot.busy { background: #fee2e2; color: #991b1b; cursor: not-allowed; border-color: #fca5a5; }
+        .t-slot.selected { background: var(--p); color: white; border-color: var(--p); }
 
-        /* Админка */
-        .admin-controls {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #fff7ed;
-            border: 2px dashed #fdba74;
-            border-radius: 12px;
-            display: none; /* Скрыто по умолчанию */
-        }
-
-        /* Уведомления и лоадер */
-        .toast {
-            position: fixed; top: 20px; right: 20px;
-            padding: 15px 25px; border-radius: 12px;
-            color: white; font-weight: 500;
-            display: none; z-index: 100;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);
-        }
-        .toast.success { background: #10b981; }
-        .toast.error { background: #ef4444; }
-
-        .loader {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.9);
-            display: none; justify-content: center; align-items: center; z-index: 50;
-            flex-direction: column; gap: 10px;
-        }
-        .spinner { width: 40px; height: 40px; border: 4px solid #ddd; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { text-align: left; font-size: 12px; color: #6b7280; padding-bottom: 8px; border-bottom: 2px solid #f3f4f6; }
+        td { padding: 12px 0; border-bottom: 1px solid #f3f4f6; font-size: 14px; }
+        
+        .del-x { color: var(--d); border: 1px solid var(--d); padding: 2px 6px; border-radius: 4px; background: none; cursor: pointer; font-weight: bold; }
+        .admin-box { background: #fff7ed; border: 1px dashed #ed8936; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="app-card">
+    <div id="loader"><div class="spin"></div><p style="margin-top:10px">Связь с сервером...</p></div>
+
     <div class="header">
-        <h1>📅 Запись</h1>
-        <button class="refresh-btn" onclick="App.loadData()">🔄 Обновить</button>
+        <h2 style="font-size: 18px;">📅 Lesson Booking</h2>
+        <button onclick="App.sync()" style="background:none; border:none; color:white; cursor:pointer; font-size:20px;">🔄</button>
     </div>
 
-    <div id="loader" class="loader">
-        <div class="spinner"></div>
-        <span id="loaderText">Загрузка...</span>
+    <div id="view-login" class="content">
+        <label>Введите ваше имя:</label>
+        <input type="text" id="in-name" placeholder="Иван Иванов">
+        <button class="btn" style="width:100%" onclick="App.login()">Войти в систему</button>
+        <button onclick="localStorage.clear(); location.reload();" style="margin-top:20px; background:none; border:none; color:#9ca3af; width:100%; font-size:12px;">Очистить кэш (если не грузит)</button>
     </div>
 
-    <div id="loginView" class="auth-screen">
-        <h2>Представьтесь</h2>
-        <input type="text" id="username" class="input-std" placeholder="Ваше Имя" autocomplete="off">
-        <button class="btn" onclick="App.login()">Войти</button>
-        <p style="color: #9ca3af; font-size: 0.8rem; margin-top: 10px;">Для админа введите: <b>admin</b></p>
-    </div>
-
-    <div id="mainView" class="app-screen">
-        <div class="user-panel">
-            <div>Привет, <b id="displayUser">User</b> <span id="adminBadge" style="display:none; color:var(--danger); font-size:0.8em;">(ADMIN)</span></div>
-            <button class="btn" style="background: #6b7280; padding: 8px 16px; font-size: 0.8rem;" onclick="App.logout()">Выйти</button>
+    <div id="view-main" class="content" style="display:none">
+        <div id="admin-tools" style="display:none" class="admin-box">
+            <p style="font-size:13px; color:#c2410c; margin-bottom:10px;">⚡ ПАНЕЛЬ АДМИНИСТРАТОРА</p>
+            <button class="btn btn-red" style="width:100%; font-size:13px;" onclick="App.clearAll()">Удалить ВООБЩЕ ВСЕ записи</button>
         </div>
 
-        <div class="admin-controls" id="adminPanel">
-            <h3 style="color: #c2410c; margin-bottom: 10px;">🔧 Админ-меню</h3>
-            <button class="btn" style="background: var(--danger); width: 100%;" onclick="App.deleteAll()">🗑 Удалить ВСЕ записи</button>
-        </div>
-
-        <div class="grid">
-            <div class="card">
-                <h3>1. Выберите время</h3>
-                <input type="date" id="datePicker" class="input-std" style="margin-bottom: 15px;" onchange="App.renderSlots()">
+        <div class="grid-ui">
+            <div>
+                <label>1. Выберите дату:</label>
+                <input type="date" id="in-date" onchange="App.render()">
                 
-                <div id="slotsContainer" class="time-slots">
-                    </div>
-
-                <div style="margin-top: 20px;">
-                    <h3>2. Длительность: <span id="durVal" style="color:var(--primary)">60</span> мин</h3>
-                    <input type="range" id="durRange" min="15" max="180" step="15" value="60" style="width:100%" oninput="document.getElementById('durVal').textContent=this.value; App.renderSlots();">
-                </div>
-
-                <button id="bookBtn" class="btn" style="width: 100%; margin-top: 20px;" onclick="App.book()" disabled>Записаться</button>
+                <label>2. Время:</label>
+                <div id="time-container" class="time-grid"></div>
+                
+                <button id="btn-book" class="btn" style="width:100%; margin-top:20px;" onclick="App.book()" disabled>Записаться</button>
             </div>
 
-            <div class="card">
-                <h3>📋 Список записей</h3>
-                <div class="table-wrap">
-                    <table id="dataTable">
-                        <thead>
-                            <tr>
-                                <th>Дата/Время</th>
-                                <th>Ученик</th>
-                                <th id="actionHeader" style="display:none; width: 50px;">Уд.</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
+            <hr style="border:0; border-top:1px solid #eee">
+
+            <div>
+                <h4>Записи на выбранный день:</h4>
+                <table id="res-table">
+                    <thead><tr><th>Время</th><th>Ученик</th><th class="adm-only" style="display:none">Уд.</th></tr></thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
+        
+        <button onclick="App.logout()" style="margin-top:30px; width:100%; background:none; border:none; color:#9ca3af; cursor:pointer;">← Выйти из аккаунта</button>
     </div>
 </div>
 
-<div id="toast" class="toast">Уведомление</div>
-
 <script>
-const CONFIG = {
-    // Используем тот же Bin ID и ключ
-    BIN_ID: '698f465fd0ea881f40b7d3e6',
-    API_KEY: '$2a$10$A3hHJ1g7sjF5BuwT2drIKewRvsdMFx0iy8Jn6wpFPse5ciB.bR9n.',
-    ADMIN_PASS: 'admin123'
+const CFG = {
+    BIN: '698f465fd0ea881f40b7d3e6',
+    KEY: '$2a$10$A3hHJ1g7sjF5BuwT2drIKewRvsdMFx0iy8Jn6wpFPse5ciB.bR9n.',
+    PASS: 'admin123'
 };
 
 const App = {
-    state: {
-        appointments: [],
-        user: null,
-        isAdmin: false,
-        selectedTime: null
+    db: [],
+    user: localStorage.getItem('u_name'),
+    isAdmin: localStorage.getItem('u_admin') === 'true',
+    selTime: null,
+
+    async init() {
+        document.getElementById('in-date').valueAsDate = new Date();
+        if (this.user) this.showMain();
+        await this.sync();
     },
 
-    init() {
-        const savedUser = localStorage.getItem('app_user');
-        const savedAdmin = localStorage.getItem('app_is_admin') === 'true';
-        
-        // Установить дату на сегодня
-        document.getElementById('datePicker').min = new Date().toISOString().split('T')[0];
-
-        if (savedUser) {
-            this.state.user = savedUser;
-            this.state.isAdmin = savedAdmin;
-            this.showMain();
-        }
-        
-        // Первая загрузка
-        this.loadData();
-    },
-
-    /* --- API --- */
-    
-    // Получить данные (с защитой от кэша)
-    async apiGet() {
+    async sync() {
+        this.toggleL(true);
         try {
-            const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN_ID}/latest?meta=false&t=${Date.now()}`, {
-                headers: { 'X-Master-Key': CONFIG.API_KEY }
+            const res = await fetch(`https://api.jsonbin.io/v3/b/${CFG.BIN}/latest`, {
+                headers: { 'X-Master-Key': CFG.KEY, 'X-Bin-Meta': 'false' }
             });
-            if (!res.ok) throw new Error('Ошибка API');
+            if (!res.ok) throw 'Err';
             const data = await res.json();
-            return Array.isArray(data) ? data : (data.record || []);
+            this.db = Array.isArray(data) ? data : [];
         } catch (e) {
-            console.error(e);
-            return [];
+            console.error("Сетевая ошибка, работаем локально");
         }
+        this.render();
+        this.toggleL(false);
     },
 
-    // Сохранить данные
-    async apiSave(newData) {
+    async save(newDb) {
+        this.toggleL(true);
         try {
-            const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN_ID}`, {
+            const res = await fetch(`https://api.jsonbin.io/v3/b/${CFG.BIN}`, {
                 method: 'PUT',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'X-Master-Key': CONFIG.API_KEY
-                },
-                body: JSON.stringify(newData)
+                headers: { 'Content-Type': 'application/json', 'X-Master-Key': CFG.KEY },
+                body: JSON.stringify(newDb)
             });
-            return res.ok;
+            if (res.ok) {
+                this.db = newDb;
+                this.render();
+            }
         } catch (e) {
-            console.error(e);
-            return false;
+            alert("Не удалось сохранить на сервер!");
         }
+        this.toggleL(false);
     },
-
-    /* --- ЛОГИКА --- */
-
-    async loadData() {
-        this.toggleLoader(true);
-        this.state.appointments = await this.apiGet();
-        this.renderAll();
-        this.toggleLoader(false);
-    },
-
-    async book() {
-        const date = document.getElementById('datePicker').value;
-        const duration = parseInt(document.getElementById('durRange').value);
-        const time = this.state.selectedTime;
-
-        if (!date || !time) return;
-
-        this.toggleLoader(true, 'Проверка...');
-
-        // 1. Скачиваем свежие данные перед записью (защита от дублей)
-        const freshData = await this.apiGet();
-
-        // 2. Проверка пересечений
-        const myEnd = this.calcEnd(time, duration);
-        const hasConflict = freshData.some(rec => {
-            if (rec.date !== date) return false;
-            const recEnd = this.calcEnd(rec.time, rec.duration);
-            return (time < recEnd && myEnd > rec.time);
-        });
-
-        if (hasConflict) {
-            this.toggleLoader(false);
-            this.state.appointments = freshData;
-            this.renderAll();
-            this.toast('❌ Это время уже занято!', 'error');
-            return;
-        }
-
-        // 3. Добавляем ID к каждой записи для возможности удаления
-        const newRecord = {
-            id: 'id_' + Date.now() + Math.random().toString(36).substr(2, 9),
-            date,
-            time,
-            duration,
-            student: this.state.user
-        };
-
-        freshData.push(newRecord);
-
-        // 4. Сохраняем
-        const ok = await this.apiSave(freshData);
-        
-        if (ok) {
-            this.state.appointments = freshData;
-            this.state.selectedTime = null; // сброс выбора
-            this.renderAll();
-            this.toast('✅ Вы записаны!', 'success');
-        } else {
-            this.toast('Ошибка сохранения', 'error');
-        }
-        
-        this.toggleLoader(false);
-    },
-
-    // Удаление одной записи (только Админ)
-    async deleteOne(id) {
-        if (!confirm('Удалить эту запись?')) return;
-
-        this.toggleLoader(true, 'Удаление...');
-        
-        // Скачиваем актуальное, чтобы не перезатереть чужие новые записи
-        const freshData = await this.apiGet();
-        
-        // Фильтруем
-        const newData = freshData.filter(rec => rec.id !== id);
-        
-        const ok = await this.apiSave(newData);
-        
-        if (ok) {
-            this.state.appointments = newData;
-            this.renderAll();
-            this.toast('Запись удалена', 'success');
-        } else {
-            this.toast('Ошибка удаления', 'error');
-        }
-
-        this.toggleLoader(false);
-    },
-
-    // Удалить ВСЁ (Админ)
-    async deleteAll() {
-        const pass = prompt('Для подтверждения напишите: удалить');
-        if (pass?.toLowerCase() !== 'удалить') return;
-
-        this.toggleLoader(true, 'Очистка...');
-        
-        const ok = await this.apiSave([]);
-        
-        if (ok) {
-            this.state.appointments = [];
-            this.renderAll();
-            this.toast('Все записи удалены', 'success');
-        } else {
-            this.toast('Ошибка', 'error');
-        }
-        
-        this.toggleLoader(false);
-    },
-
-    /* --- ИНТЕРФЕЙС --- */
 
     login() {
-        const name = document.getElementById('username').value.trim();
-        if (!name) return this.toast('Введите имя', 'error');
-
-        if (name.toLowerCase() === 'admin') {
-            const pass = prompt('Пароль администратора:');
-            if (pass !== CONFIG.ADMIN_PASS) return this.toast('Неверный пароль', 'error');
-            this.state.isAdmin = true;
-            this.state.user = 'Администратор';
-        } else {
-            this.state.isAdmin = false;
-            this.state.user = name;
+        const n = document.getElementById('in-name').value.trim();
+        if (!n) return;
+        if (n.toLowerCase() === 'admin') {
+            if (prompt('Пароль администратора:') !== CFG.PASS) return alert('Неверно');
+            this.isAdmin = true;
         }
-
-        localStorage.setItem('app_user', this.state.user);
-        localStorage.setItem('app_is_admin', this.state.isAdmin);
+        this.user = n;
+        localStorage.setItem('u_name', n);
+        localStorage.setItem('u_admin', this.isAdmin);
         this.showMain();
     },
 
-    logout() {
-        localStorage.clear();
-        location.reload();
-    },
+    logout() { localStorage.clear(); location.reload(); },
 
     showMain() {
-        document.getElementById('loginView').style.display = 'none';
-        document.getElementById('mainView').style.display = 'block';
-        document.getElementById('displayUser').textContent = this.state.user;
-        
-        if (this.state.isAdmin) {
-            document.getElementById('adminPanel').style.display = 'block';
-            document.getElementById('adminBadge').style.display = 'inline';
-            document.getElementById('actionHeader').style.display = 'table-cell';
-        }
-        
-        this.renderAll();
-    },
-
-    renderAll() {
-        this.renderSlots();
-        this.renderTable();
-    },
-
-    renderSlots() {
-        const container = document.getElementById('slotsContainer');
-        const date = document.getElementById('datePicker').value;
-        const duration = parseInt(document.getElementById('durRange').value);
-        
-        container.innerHTML = '';
-        document.getElementById('bookBtn').disabled = true;
-
-        if (!date) {
-            container.innerHTML = '<div style="padding:10px; color:#888;">Выберите дату</div>';
-            return;
-        }
-
-        const startH = 8, endH = 22;
-        
-        for (let h = startH; h < endH; h++) {
-            for (let m = 0; m < 60; m += 15) {
-                const time = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
-                const div = document.createElement('div');
-                div.className = 'slot';
-                div.textContent = time;
-
-                // Расчет конфликтов
-                const myEnd = this.calcEnd(time, duration);
-                const conflict = this.state.appointments.find(r => {
-                    if (r.date !== date) return false;
-                    const rEnd = this.calcEnd(r.time, r.duration);
-                    return (time < rEnd && myEnd > r.time);
-                });
-
-                if (conflict) {
-                    if (conflict.student === this.state.user) {
-                        div.className += ' mine';
-                    } else {
-                        div.className += ' busy';
-                    }
-                } else {
-                    div.onclick = () => {
-                        document.querySelectorAll('.slot.selected').forEach(el => el.classList.remove('selected'));
-                        div.classList.add('selected');
-                        this.state.selectedTime = time;
-                        document.getElementById('bookBtn').disabled = false;
-                    };
-                    if (this.state.selectedTime === time) div.classList.add('selected');
-                }
-                
-                container.appendChild(div);
-            }
+        document.getElementById('view-login').style.display = 'none';
+        document.getElementById('view-main').style.display = 'block';
+        if (this.isAdmin) {
+            document.getElementById('admin-tools').style.display = 'block';
+            document.querySelectorAll('.adm-only').forEach(el => el.style.display = 'table-cell');
         }
     },
 
-    renderTable() {
-        const tbody = document.querySelector('#dataTable tbody');
+    book() {
+        const date = document.getElementById('in-date').value;
+        const entry = { id: Date.now(), d: date, t: this.selTime, u: this.user };
+        const updated = [...this.db, entry];
+        this.save(updated);
+        this.selTime = null;
+    },
+
+    deleteSingle(id) {
+        if (!confirm('Удалить эту конкретную запись?')) return;
+        const updated = this.db.filter(x => x.id !== id);
+        this.save(updated);
+    },
+
+    clearAll() {
+        if (!confirm('Вы уверены? Это сотрет ВСЕ записи в базе!')) return;
+        this.save([]);
+    },
+
+    render() {
+        const date = document.getElementById('in-date').value;
+        
+        // Время
+        const cont = document.getElementById('time-container');
+        cont.innerHTML = '';
+        for (let h = 8; h <= 21; h++) {
+            const time = `${h}:00`;
+            const isBusy = this.db.some(x => x.d === date && x.t === time);
+            const d = document.createElement('div');
+            d.className = `t-slot ${isBusy ? 'busy' : ''} ${this.selTime === time ? 'selected' : ''}`;
+            d.textContent = time;
+            if (!isBusy) d.onclick = () => { this.selTime = time; this.render(); };
+            cont.appendChild(d);
+        }
+        document.getElementById('btn-book').disabled = !this.selTime;
+
+        // Таблица
+        const tbody = document.querySelector('#res-table tbody');
         tbody.innerHTML = '';
-
-        const sorted = [...this.state.appointments].sort((a,b) => {
-            return (a.date + a.time).localeCompare(b.date + b.time);
-        });
-
-        if (sorted.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px; color:#999;">Нет записей</td></tr>';
-            return;
+        const dayList = this.db.filter(x => x.d === date).sort((a,b) => a.t.localeCompare(b.t));
+        
+        if(dayList.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="color:#999; text-align:center">Нет записей</td></tr>';
         }
 
-        sorted.forEach(rec => {
+        dayList.forEach(x => {
             const tr = document.createElement('tr');
-            const endTime = this.calcEnd(rec.time, rec.duration);
-            
-            // Кнопка удаления (только для админа)
-            let deleteBtnHtml = '';
-            if (this.state.isAdmin) {
-                deleteBtnHtml = `
-                    <td style="text-align:center;">
-                        <button class="del-btn" onclick="App.deleteOne('${rec.id}')">×</button>
-                    </td>`;
-            }
-
-            tr.innerHTML = `
-                <td>
-                    <div style="font-weight:600">${rec.date}</div>
-                    <div style="color:#6b7280; font-size:0.85em">${rec.time} - ${endTime}</div>
-                </td>
-                <td>${rec.student}</td>
-                ${deleteBtnHtml}
-            `;
+            tr.innerHTML = `<td><b>${x.t}</b></td><td>${x.u}</td>
+            ${this.isAdmin ? `<td><button class="del-x" onclick="App.deleteSingle(${x.id})">×</button></td>` : ''}`;
             tbody.appendChild(tr);
         });
     },
 
-    /* --- Утилиты --- */
-    
-    calcEnd(start, mins) {
-        const [h, m] = start.split(':').map(Number);
-        const total = h * 60 + m + parseInt(mins);
-        return `${Math.floor(total/60)%24}:${(total%60).toString().padStart(2,'0').substring(0,2)}`;
-    },
-
-    toggleLoader(show, text) {
-        document.getElementById('loader').style.display = show ? 'flex' : 'none';
-        if(text) document.getElementById('loaderText').textContent = text;
-    },
-
-    toast(msg, type = 'success') {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.className = `toast ${type}`;
-        t.style.display = 'block';
-        setTimeout(() => t.style.display = 'none', 3000);
-    }
+    toggleL(s) { document.getElementById('loader').style.display = s ? 'flex' : 'none'; }
 };
 
 App.init();

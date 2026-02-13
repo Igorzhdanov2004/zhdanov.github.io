@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<!--
+Created using JS Bin
+http://jsbin.com
+
+Copyright (c) 2026 by anonymous (http://jsbin.com/mofigukamu/1/edit)
+
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+<meta name="robots" content="noindex">
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎓 Расписание занятий с репетитором</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #667eea 0%, #8e6bc0 50%, #b15eb5 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .container {
+            max-width: 1300px;
+            width: 100%;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 40px;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.3), 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2b3d8f, #6b3f9b, #aa4e9c);
+            color: white;
+            padding: 35px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: "📚";
+            font-size: 120px;
+            position: absolute;
+            right: 20px;
+            bottom: -20px;
+            opacity: 0.1;
+            transform: rotate(15deg);
+        }
+
+        .header h1 {
+            font-size: 3em;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 0 rgba(0,0,0,0.1);
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .login-section {
+            background: white;
+            padding: 25px 30px;
+            border-bottom: 3px solid #f0f0f0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.02);
+        }
+
+        .login-form {
+            display: flex;
+            gap: 15px;
+            max-width: 550px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+
+        .login-form input {
+            flex: 2;
+            min-width: 250px;
+            padding: 16px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 60px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+
+        .login-form input:focus {
+            border-color: #8e6bc0;
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 5px rgba(142, 107, 192, 0.1);
+        }
+
+        .login-form button {
+            padding: 16px 35px;
+            background: linear-gradient(145deg, #2b3d8f, #6b3f9b);
+            color: white;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 8px 15px rgba(43, 61, 143, 0.3);
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .login-form button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(43, 61, 143, 0.4);
+            background: linear-gradient(145deg, #3549a8, #7e4bb3);
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: #ede7f6;
+            border-bottom: 2px solid #d1c4e9;
+            font-weight: 500;
+            color: #2b3d8f;
+        }
+
+        .user-info span {
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logout-btn {
+            padding: 10px 25px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255,107,107,0.3);
+        }
+
+        .logout-btn:hover {
+            background: #ff5252;
+            transform: scale(1.05);
+        }
+
+        .main-content {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 30px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+        }
+
+        .card h2 {
+            color: #2b3d8f;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 3px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+
+        .date-picker {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            font-size: 18px;
+            margin: 15px 0;
+            transition: all 0.3s;
+        }
+
+        .date-picker:focus {
+            border-color: #8e6bc0;
+            outline: none;
+            box-shadow: 0 0 0 5px rgba(142, 107, 192, 0.1);
+        }
+
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+            max-height: 450px;
+            overflow-y: auto;
+            padding: 10px 5px;
+            margin: 15px 0;
+            background: #f8f9fa;
+            border-radius: 25px;
+            padding: 20px;
+        }
+
+        .time-btn {
+            padding: 15px 5px;
+            text-align: center;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            color: #444;
+            transition: all 0.2s;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+        }
+
+        .time-btn:hover:not(.booked):not(.selected) {
+            border-color: #8e6bc0;
+            background: #f3e8ff;
+            transform: scale(1.03);
+        }
+
+        .time-btn.selected {
+            background: linear-gradient(145deg, #2b3d8f, #6b3f9b);
+            color: white;
+            border-color: #2b3d8f;
+            box-shadow: 0 8px 18px rgba(43,61,143,0.4);
+        }
+
+        .time-btn.booked {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+            cursor: not-allowed;
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+
+        .time-btn.my-booking {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+            font-weight: 700;
+            cursor: default;
+        }
+
+        .duration-slider {
+            margin: 25px 0 15px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 25px;
+        }
+
+        .duration-slider label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: #2b3d8f;
+            font-size: 1.2em;
+        }
+
+        .duration-slider input {
+            width: 100%;
+            margin: 10px 0;
+            accent-color: #8e6bc0;
+            height: 8px;
+        }
+
+        .duration-value {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #2b3d8f;
+            background: white;
+            display: inline-block;
+            padding: 8px 25px;
+            border-radius: 40px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .book-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(145deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.5em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 25px rgba(40,167,69,0.4);
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+
+        .book-btn:hover:not(:disabled) {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 35px rgba(40,167,69,0.5);
+            background: linear-gradient(145deg, #2ecc71, #28a745);
+        }
+
+        .book-btn:disabled {
+            background: #cccccc;
+            box-shadow: none;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .appointments-section {
+            grid-column: span 2;
+            background: white;
+            border-radius: 30px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 20px;
+            background: #f8f9fa;
+            padding: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        th {
+            background: linear-gradient(145deg, #2b3d8f, #6b3f9b);
+            color: white;
+            padding: 18px 12px;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #444;
+        }
+
+        tr:hover {
+            background: #f3e8ff;
+        }
+
+        .my-booking-row {
+            background: #e8f5e9;
+            font-weight: 500;
+        }
+
+        .my-badge {
+            background: #28a745;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .admin-section {
+            grid-column: span 2;
+            background: #fff3e0;
+            border-radius: 30px;
+            padding: 25px;
+            border: 2px solid #ffb74d;
+        }
+
+        .admin-stats {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .stat-card h3 {
+            color: #ff9800;
+            margin-bottom: 10px;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #2b3d8f;
+        }
+
+        .clear-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1em;
+            box-shadow: 0 8px 18px rgba(244,67,54,0.3);
+        }
+
+        .clear-btn:hover {
+            background: #d32f2f;
+            transform: translateY(-3px);
+        }
+
+        .message {
+            padding: 18px 25px;
+            border-radius: 50px;
+            margin: 20px 30px;
+            font-weight: 600;
+            text-align: center;
+            animation: fadeIn 0.3s;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+            display: block;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 25px;
+            background: #f8f9fa;
+            color: #666;
+            font-size: 1.1em;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .appointments-section, .admin-section {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Запишись на занятие</h1>
+            <p>Выбери дату, время и длительность</p>
+        </div>
+
+        <div id="loginSection" class="login-section">
+            <div class="login-form">
+                <input type="text" id="studentName" placeholder="Твоё имя (например, Анна)" required>
+                <button onclick="login()">Войти ✨</button>
+            </div>
+        </div>
+
+        <div id="userInfo" class="user-info" style="display: none;">
+            <span>👤 <span id="welcomeMessage"></span></span>
+            <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
+        </div>
+
+        <div id="mainContent" class="main-content" style="display: none;">
+            <!-- Карточка выбора даты и времени -->
+            <div class="card">
+                <h2>📅 1. Выбери дату</h2>
+                <input type="date" id="datePicker" class="date-picker" onchange="selectDate()">
+                
+                <h2 style="margin-top: 20px;">⏰ 2. Выбери время</h2>
+                <div id="timeSlots" class="time-grid"></div>
+            </div>
+
+            <!-- Карточка длительности и записи -->
+            <div class="card">
+                <h2>⏳ 3. Длительность занятия</h2>
+                <div class="duration-slider">
+                    <label>Сколько минут? <span id="durationDisplay" class="duration-value">60 мин</span></label>
+                    <input type="range" id="durationSlider" min="15" max="180" step="15" value="60" oninput="updateDuration()">
+                    <div style="display: flex; justify-content: space-between; color: #666; margin-top: 5px;">
+                        <span>15 мин</span>
+                        <span>90 мин</span>
+                        <span>180 мин</span>
+                    </div>
+                </div>
+
+                <button id="bookBtn" class="book-btn" onclick="bookTime()" disabled>✅ Записаться</button>
+                
+                <div style="margin-top: 20px; background: #f0f4ff; padding: 15px; border-radius: 20px;">
+                    <p style="color: #2b3d8f;">📌 Твоя запись:</p>
+                    <p id="selectedInfo" style="font-weight: 600;">Ничего не выбрано</p>
+                </div>
+            </div>
+
+            <!-- Таблица всех записей -->
+            <div class="appointments-section">
+                <h2>📋 Все записи</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>Дата</th><th>Время</th><th>Длит.</th><th>До</th><th>Ученик</th></tr>
+                        </thead>
+                        <tbody id="appointmentsList"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Админ панель -->
+            <div id="adminPanel" class="admin-section" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                    <h2>🔐 Админ-панель</h2>
+                    <button class="clear-btn" onclick="clearAllBookings()">🗑 Очистить всё</button>
+                </div>
+                <div id="adminStats" class="admin-stats"></div>
+            </div>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <div class="footer">
+            ⏰ Время МСК: 00:00 - 24:00 (шаг 15 мин) • ⏳ Занятия до 180 минут
+        </div>
+    </div>
+
+    <script>
+        let appointments = JSON.parse(localStorage.getItem('beautifulSchedule')) || [];
+        let currentUser = null;
+        let isAdmin = false;
+        let selectedDate = null;
+        let selectedTime = null;
+        let selectedDuration = 60;
+
+        const ADMIN_PASSWORD = 'admin123';
+
+        function login() {
+            let name = document.getElementById('studentName').value.trim();
+            if (!name) {
+                showMessage('Введи имя', 'error');
+                return;
+            }
+
+            if (name.toLowerCase() === 'admin') {
+                let pwd = prompt('Пароль админа:');
+                if (pwd === ADMIN_PASSWORD) {
+                    isAdmin = true;
+                } else {
+                    showMessage('Неверный пароль', 'error');
+                    return;
+                }
+            }
+
+            currentUser = name;
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'flex';
+            document.getElementById('mainContent').style.display = 'grid';
+            document.getElementById('welcomeMessage').innerText = currentUser + (isAdmin ? ' (админ)' : '');
+            
+            if (isAdmin) {
+                document.getElementById('adminPanel').style.display = 'block';
+                updateAdminStats();
+            }
+            
+            showMessage('✅ Привет, ' + currentUser + '!', 'success');
+            renderTimeSlots();
+            renderAppointments();
+        }
+
+        function logout() {
+            currentUser = null;
+            isAdmin = false;
+            selectedDate = null;
+            selectedTime = null;
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('datePicker').value = '';
+            document.getElementById('timeSlots').innerHTML = '';
+            document.getElementById('selectedInfo').innerText = 'Ничего не выбрано';
+            document.getElementById('bookBtn').disabled = true;
+        }
+
+        function selectDate() {
+            if (!currentUser) {
+                showMessage('Сначала войди', 'error');
+                return;
+            }
+            selectedDate = document.getElementById('datePicker').value;
+            selectedTime = null;
+            document.getElementById('bookBtn').disabled = true;
+            renderTimeSlots();
+            updateSelectedInfo();
+        }
+
+        function renderTimeSlots() {
+            if (!selectedDate || !currentUser) {
+                document.getElementById('timeSlots').innerHTML = '<p style="padding: 20px;">Сначала выбери дату</p>';
+                return;
+            }
+
+            let html = '';
+            for (let h = 0; h < 24; h++) {
+                for (let m = 0; m < 60; m += 15) {
+                    let time = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+                    let endTime = addMinutes(time, selectedDuration);
+                    
+                    let isBooked = appointments.some(a => 
+                        a.date === selectedDate && 
+                        a.time === time
+                    );
+
+                    let isMyBooking = appointments.some(a => 
+                        a.date === selectedDate && 
+                        a.time === time && 
+                        a.student === currentUser
+                    );
+
+                    let timeClass = 'time-btn';
+                    if (isBooked) timeClass += isMyBooking ? ' my-booking' : ' booked';
+                    if (selectedTime === time && !isBooked) timeClass += ' selected';
+
+                    html += `<div class="${timeClass}" 
+                              onclick="${!isBooked ? 'selectTime(\''+time+'\')' : ''}">
+                              ${time} ⏰</div>`;
+                }
+            }
+            document.getElementById('timeSlots').innerHTML = html;
+        }
+
+        function addMinutes(time, minutes) {
+            let [h, m] = time.split(':').map(Number);
+            let total = h * 60 + m + minutes;
+            let newH = Math.floor(total / 60) % 24;
+            let newM = total % 60;
+            return `${newH.toString().padStart(2,'0')}:${newM.toString().padStart(2,'0')}`;
+        }
+
+        function selectTime(time) {
+            selectedTime = time;
+            document.getElementById('bookBtn').disabled = false;
+            renderTimeSlots();
+            updateSelectedInfo();
+        }
+
+        function updateDuration() {
+            selectedDuration = parseInt(document.getElementById('durationSlider').value);
+            document.getElementById('durationDisplay').innerText = selectedDuration + ' мин';
+            updateSelectedInfo();
+        }
+
+        function updateSelectedInfo() {
+            if (selectedDate && selectedTime) {
+                let endTime = addMinutes(selectedTime, selectedDuration);
+                document.getElementById('selectedInfo').innerHTML = 
+                    `📅 ${selectedDate} с ${selectedTime} до ${endTime} (${selectedDuration} мин)`;
+            } else {
+                document.getElementById('selectedInfo').innerText = 'Ничего не выбрано';
+            }
+        }
+
+        function bookTime() {
+            if (!currentUser || !selectedDate || !selectedTime) {
+                showMessage('Выбери дату и время', 'error');
+                return;
+            }
+
+            let endTime = addMinutes(selectedTime, selectedDuration);
+
+            // Проверка на пересечение с другими занятиями
+            let overlapping = appointments.some(a => {
+                if (a.date !== selectedDate) return false;
+                
+                let aEnd = addMinutes(a.time, a.duration);
+                
+                // Проверка пересечения интервалов
+                return (selectedTime < aEnd && endTime > a.time);
+            });
+
+            if (overlapping) {
+                showMessage('❌ Это время пересекается с другим занятием', 'error');
+                return;
+            }
+
+            appointments.push({
+                date: selectedDate,
+                time: selectedTime,
+                duration: selectedDuration,
+                endTime: endTime,
+                student: currentUser,
+                timestamp: new Date().toISOString()
+            });
+
+            localStorage.setItem('beautifulSchedule', JSON.stringify(appointments));
+
+            showMessage('✅ Ты записан! До встречи на занятии', 'success');
+            selectedTime = null;
+            document.getElementById('bookBtn').disabled = true;
+            renderTimeSlots();
+            renderAppointments();
+            updateAdminStats();
+            updateSelectedInfo();
+        }
+
+        function renderAppointments() {
+            let sorted = [...appointments].sort((a, b) => 
+                (a.date + ' ' + a.time).localeCompare(b.date + ' ' + b.time)
+            );
+
+            let html = '';
+            sorted.forEach(a => {
+                let isMy = (a.student === currentUser);
+                let endTime = addMinutes(a.time, a.duration);
+                html += `<tr class="${isMy ? 'my-booking-row' : ''}">
+                    <td>${a.date}</td>
+                    <td>${a.time}</td>
+                    <td>${a.duration} мин</td>
+                    <td>${endTime}</td>
+                    <td>${a.student} ${isMy ? '⭐ (ты)' : ''}</td>
+                </tr>`;
+            });
+
+            if (html === '') {
+                html = '<tr><td colspan="5" style="text-align:center; padding:40px;">📭 Пока записей нет</td></tr>';
+            }
+            document.getElementById('appointmentsList').innerHTML = html;
+        }
+
+        function updateAdminStats() {
+            if (!isAdmin) return;
+
+            let total = appointments.length;
+            let unique = new Set(appointments.map(a => a.student)).size;
+            let today = new Date().toISOString().split('T')[0];
+            let todayCount = appointments.filter(a => a.date === today).length;
+
+            document.getElementById('adminStats').innerHTML = `
+                <div class="stat-card"><h3>📌 Всего</h3><div class="stat-number">${total}</div></div>
+                <div class="stat-card"><h3>👥 Учеников</h3><div class="stat-number">${unique}</div></div>
+                <div class="stat-card"><h3>📅 Сегодня</h3><div class="stat-number">${todayCount}</div></div>
+            `;
+        }
+
+        function clearAllBookings() {
+            if (!isAdmin) return;
+            if (confirm('Точно удалить ВСЕ записи?')) {
+                appointments = [];
+                localStorage.setItem('beautifulSchedule', JSON.stringify(appointments));
+                renderTimeSlots();
+                renderAppointments();
+                updateAdminStats();
+                showMessage('🧹 Все записи очищены', 'success');
+            }
+        }
+
+        function showMessage(text, type) {
+            let msg = document.getElementById('message');
+            msg.innerText = text;
+            msg.className = 'message ' + type;
+            setTimeout(() => {
+                msg.style.display = 'none';
+            }, 3000);
+        }
+
+        // Инициализация при загрузке
+        renderAppointments();
+    </script>
+</body>
+</html>

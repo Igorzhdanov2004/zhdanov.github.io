@@ -3,65 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Бронирование 24/15 — Исправлено</title>
+    <title>Бронирование — Финальная Проверка</title>
     <style>
-        :root { 
-            --primary: #6366f1; 
-            --danger: #ef4444; 
-            --success: #10b981;
-            --bg: #f8fafc; 
-            --card: #ffffff;
-            --text: #1e293b;
-        }
-
+        :root { --p: #6366f1; --d: #ef4444; --s: #10b981; --bg: #f8fafc; --text: #1e293b; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text); padding: 15px; display: flex; justify-content: center; }
-        .app-container { width: 100%; max-width: 900px; background: var(--card); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.1); overflow: hidden; position: relative; }
-
-        #loader { position: absolute; inset: 0; background: rgba(255,255,255,0.8); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        .app-container { width: 100%; max-width: 850px; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; position: relative; }
+        #loader { position: absolute; inset: 0; background: rgba(255,255,255,0.8); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--p); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .header { background: #1e293b; color: white; padding: 25px; display: flex; justify-content: space-between; align-items: center; }
-        .content { padding: 25px; }
-
-        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px; color: #64748b; }
-        input, select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; margin-bottom: 15px; font-size: 16px; outline: none; background: #f1f5f9; }
-
-        .time-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); 
-            gap: 8px; 
-            max-height: 250px; 
-            overflow-y: auto; 
-            padding: 10px;
-            background: #f1f5f9;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
+        .header { background: #1e293b; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .content { padding: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; color: #64748b; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; margin-bottom: 15px; font-size: 16px; outline: none; }
+        .time-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 8px; max-height: 250px; overflow-y: auto; padding: 10px; background: #f1f5f9; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
         .slot { padding: 10px 5px; background: white; border: 1px solid #cbd5e1; border-radius: 8px; text-align: center; cursor: pointer; font-size: 13px; font-weight: 600; }
-        .slot.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        .slot.selected { background: var(--p); color: white; border-color: var(--p); }
         .slot.busy { background: #fee2e2; color: #991b1b; cursor: not-allowed; opacity: 0.6; }
-
         .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary { background: var(--p); color: white; }
         .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 25px; }
         th { text-align: left; padding: 10px; font-size: 12px; color: #64748b; border-bottom: 2px solid #f1f5f9; }
         td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
-        
-        .del-btn { padding: 5px 10px; border-radius: 6px; border: 1px solid #fecaca; background: #fff1f2; color: var(--danger); cursor: pointer; font-size: 11px; font-weight: bold; }
-        .my-badge { background: var(--success); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 5px; }
+        .del-btn { padding: 5px 10px; border-radius: 6px; border: 1px solid #fecaca; background: #fff1f2; color: var(--d); cursor: pointer; font-size: 11px; font-weight: bold; }
+        .my-badge { background: var(--s); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 5px; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <div id="loader"><div class="spinner"></div></div>
-
     <div class="header">
-        <h1 id="title">📅 Запись</h1>
+        <h2 id="title">Запись на занятия</h2>
         <button onclick="App.sync()" style="background:none; border:none; color:white; cursor:pointer; font-size:20px;">🔄</button>
     </div>
 
@@ -94,17 +68,17 @@
             </div>
         </div>
 
-        <label>Время начала</label>
+        <label>Доступное время (нажмите для выбора)</label>
         <div id="time-grid" class="time-grid"></div>
 
-        <button id="btn-book" class="btn btn-primary" onclick="App.book()" disabled>Забронировать</button>
+        <button id="btn-book" class="btn btn-primary" onclick="App.book()" disabled>Забронировать время</button>
 
         <table>
             <thead><tr><th>Время</th><th>Ученик</th><th>Действие</th></tr></thead>
             <tbody id="res-table"></tbody>
         </table>
         
-        <button onclick="App.logout()" style="margin-top:30px; width:100%; background:none; border:none; color:#94a3b8; font-size:12px; cursor:pointer;">Выйти</button>
+        <button onclick="App.logout()" style="margin-top:30px; width:100%; background:none; border:none; color:#94a3b8; font-size:12px; cursor:pointer;">Сменить пользователя</button>
     </div>
 </div>
 
@@ -125,33 +99,37 @@ const App = {
         document.getElementById('in-date').valueAsDate = new Date();
         if (this.user) this.showMain();
         await this.sync();
-        // Автообновление каждые 30 сек
-        setInterval(() => this.sync(), 30000);
+        setInterval(() => this.sync(), 20000); // Обновление раз в 20 сек
     },
 
     async sync() {
         try {
-            const res = await fetch(`https://api.jsonbin.io/v3/b/${CFG.BIN}/latest?t=${Date.now()}`, {
-                headers: { 'X-Master-Key': CFG.KEY, 'X-Bin-Meta': 'false' }
+            // Используем cache: 'no-store' для мгновенного освобождения слотов
+            const res = await fetch(`https://api.jsonbin.io/v3/b/${CFG.BIN}/latest`, {
+                headers: { 'X-Master-Key': CFG.KEY, 'X-Bin-Meta': 'false' },
+                cache: 'no-store'
             });
             const data = await res.json();
             this.db = Array.isArray(data) ? data : [];
             this.render();
-        } catch (e) { console.error("Ошибка обновления"); }
+        } catch (e) { console.error("Ошибка синхронизации"); }
     },
 
     async save(newDb) {
         this.toggleL(true);
+        document.getElementById('btn-book').disabled = true; // Блокируем кнопку
         try {
-            await fetch(`https://api.jsonbin.io/v3/b/${CFG.BIN}`, {
+            const res = await fetch(`https://api.jsonbin.io/v3/b/${CFG.BIN}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'X-Master-Key': CFG.KEY },
                 body: JSON.stringify(newDb)
             });
-            this.db = newDb;
-            this.selTime = null; // Сброс выбора после любого действия
-            this.render();
-        } catch (e) { alert("Ошибка сервера"); }
+            if (res.ok) {
+                this.db = newDb;
+                this.selTime = null;
+                await this.sync(); // Принудительно перекачиваем данные
+            }
+        } catch (e) { alert("Ошибка сохранения на сервер"); }
         this.toggleL(false);
     },
 
@@ -177,20 +155,35 @@ const App = {
         if (this.isAdmin) document.getElementById('admin-tools').style.display = 'block';
     },
 
-    book() {
+    async book() {
         const date = document.getElementById('in-date').value;
         const dur = parseInt(document.getElementById('in-duration').value);
-        const newDb = [...this.db, { id: Date.now(), d: date, start: this.selTime, end: this.selTime + dur, u: this.user }];
-        this.save(newDb);
+        const myStart = this.selTime;
+        const myEnd = this.selTime + dur;
+
+        // ПРОВЕРКА ПЕРЕД СОХРАНЕНИЕМ (чтобы не было накладок)
+        // Сначала обновляем данные с сервера
+        await this.sync();
+        
+        const isConflict = this.db.some(x => x.d === date && (myStart < x.end && myEnd > x.start));
+
+        if (isConflict) {
+            alert("К сожалению, это время (или его часть) уже успели занять. Выберите другое.");
+            this.selTime = null;
+            this.render();
+            return;
+        }
+
+        const newEntry = { id: Date.now(), d: date, start: myStart, end: myEnd, u: this.user };
+        await this.save([...this.db, newEntry]);
     },
 
     deleteRow(id) {
-        if (!confirm('Отменить запись?')) return;
-        const newDb = this.db.filter(x => x.id !== id);
-        this.save(newDb);
+        if (!confirm('Удалить эту запись?')) return;
+        this.save(this.db.filter(x => x.id !== id));
     },
 
-    clearAll() { if (confirm('Удалить ВСЕ записи?')) this.save([]); },
+    clearAll() { if (confirm('Удалить всё?')) this.save([]); },
 
     formatTime(m) {
         return `${Math.floor(m/60).toString().padStart(2,'0')}:${(m%60).toString().padStart(2,'0')}`;
@@ -206,14 +199,16 @@ const App = {
 
         for (let m = 0; m < 1440; m += 15) {
             const myEnd = m + dur;
-            // Проверка на пересечение: начало моей записи раньше конца существующей И конец моей записи позже начала существующей
+            // Корректная формула пересечения
             const isBusy = dayBusy.some(x => (m < x.end && myEnd > x.start));
             const isOver = myEnd > 1440;
 
             const d = document.createElement('div');
             d.className = `slot ${isBusy || isOver ? 'busy' : ''} ${this.selTime === m ? 'selected' : ''}`;
             d.textContent = this.formatTime(m);
-            if (!isBusy && !isOver) d.onclick = () => { this.selTime = m; this.render(); };
+            if (!isBusy && !isOver) {
+                d.onclick = () => { this.selTime = m; this.render(); };
+            }
             cont.appendChild(d);
         }
         document.getElementById('btn-book').disabled = (this.selTime === null);
@@ -232,6 +227,7 @@ const App = {
             `;
             tbody.appendChild(tr);
         });
+        if(!list.length) tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#94a3b8; padding:20px;">Нет записей</td></tr>';
     },
 
     toggleL(s) { document.getElementById('loader').style.display = s ? 'flex' : 'none'; }

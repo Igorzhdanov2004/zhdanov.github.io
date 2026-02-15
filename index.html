@@ -3,64 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Бронирование — Финальная Проверка</title>
+    <title>Бронирование — Финальная Версия</title>
     <style>
         :root { --p: #6366f1; --d: #ef4444; --s: #10b981; --bg: #f8fafc; --text: #1e293b; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text); padding: 15px; display: flex; justify-content: center; }
-        .app-container { width: 100%; max-width: 850px; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; position: relative; }
-        #loader { position: absolute; inset: 0; background: rgba(255,255,255,0.8); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .app-container { width: 100%; max-width: 850px; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; position: relative; min-height: 400px; }
+        
+        /* Лоадер */
+        #loader { position: absolute; inset: 0; background: rgba(255,255,255,0.9); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); flex-direction: column; gap: 15px; }
         .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--p); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
         .header { background: #1e293b; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
         .content { padding: 20px; }
+        
         label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; color: #64748b; }
-        input, select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; margin-bottom: 15px; font-size: 16px; outline: none; }
-        .time-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 8px; max-height: 250px; overflow-y: auto; padding: 10px; background: #f1f5f9; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
-        .slot { padding: 10px 5px; background: white; border: 1px solid #cbd5e1; border-radius: 8px; text-align: center; cursor: pointer; font-size: 13px; font-weight: 600; }
-        .slot.selected { background: var(--p); color: white; border-color: var(--p); }
-        .slot.busy { background: #fee2e2; color: #991b1b; cursor: not-allowed; opacity: 0.6; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; margin-bottom: 15px; font-size: 16px; outline: none; transition: 0.2s; }
+        input:focus, select:focus { border-color: var(--p); }
+        
+        .time-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 8px; max-height: 300px; overflow-y: auto; padding: 10px; background: #f8fafc; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
+        .slot { padding: 10px 5px; background: white; border: 1px solid #cbd5e1; border-radius: 8px; text-align: center; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.1s; user-select: none; }
+        .slot:hover { border-color: var(--p); }
+        .slot.selected { background: var(--p); color: white; border-color: var(--p); transform: scale(1.05); }
+        .slot.busy { background: #fee2e2; color: #991b1b; cursor: not-allowed; opacity: 0.5; border-color: #fecaca; }
+        
         .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .btn-primary { background: var(--p); color: white; }
+        .btn-primary:hover { background: #4f46e5; }
         .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; }
+        
         table { width: 100%; border-collapse: collapse; margin-top: 25px; }
         th { text-align: left; padding: 10px; font-size: 12px; color: #64748b; border-bottom: 2px solid #f1f5f9; }
         td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
-        .del-btn { padding: 5px 10px; border-radius: 6px; border: 1px solid #fecaca; background: #fff1f2; color: var(--d); cursor: pointer; font-size: 11px; font-weight: bold; }
-        .my-badge { background: var(--s); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 5px; }
-        .warning { color: var(--d); font-size: 14px; margin-top: 10px; padding: 8px; background: #fff1f2; border-radius: 8px; display: none; }
+        
+        .del-btn { padding: 6px 12px; border-radius: 6px; border: none; background: #fee2e2; color: var(--d); cursor: pointer; font-size: 12px; font-weight: bold; }
+        .del-btn:hover { background: #fecaca; }
+        .my-badge { background: var(--s); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 5px; vertical-align: middle; }
+        
+        .warning { color: #b91c1c; font-size: 14px; margin-top: 10px; padding: 12px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; display: none; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div id="loader"><div class="spinner"></div></div>
+    <div id="loader">
+        <div class="spinner"></div>
+        <div style="font-size: 14px; color: #64748b;">Синхронизация...</div>
+    </div>
+    
     <div class="header">
-        <h2 id="title">Запись на занятия</h2>
-        <button onclick="App.sync()" style="background:none; border:none; color:white; cursor:pointer; font-size:20px;">🔄</button>
+        <h2 id="title">Запись</h2>
+        <div style="display:flex; gap:15px; align-items:center;">
+            <button onclick="App.sync(true)" style="background:none; border:none; color:white; cursor:pointer; font-size:24px;" title="Обновить">↻</button>
+        </div>
     </div>
 
     <div id="view-login" class="content">
+        <h3 style="margin-bottom: 20px;">Представьтесь</h3>
         <label>Ваше Имя</label>
-        <input type="text" id="in-name" placeholder="Введите имя...">
-        <button class="btn btn-primary" onclick="App.login()">Войти</button>
-        <div class="warning" id="login-warning">Пожалуйста, введите ваше имя</div>
+        <input type="text" id="in-name" placeholder="Например: Иван Иванов">
+        <button class="btn btn-primary" onclick="App.login()">Войти в систему</button>
+        <div class="warning" id="login-warning">Пожалуйста, введите имя</div>
     </div>
 
     <div id="view-main" class="content" style="display:none">
-        <div id="admin-tools" style="display:none; padding:10px; border:1px dashed orange; margin-bottom:15px; border-radius:10px;">
-            <button class="btn" style="background:#fff1f2; color:red; padding:8px;" onclick="App.clearAll()">Очистить всё (Админ)</button>
+        
+        <div id="admin-tools" style="display:none; padding:15px; background: #fff7ed; border:1px dashed orange; margin-bottom:20px; border-radius:10px;">
+            <h4 style="margin-bottom:10px; color: orange;">Панель администратора</h4>
+            <button class="btn" style="background:#fff1f2; color:red; padding:10px; font-size:14px;" onclick="App.clearAll()">⚠ Удалить ВСЕ записи</button>
         </div>
 
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
             <div>
-                <label>Дата</label>
-                <input type="date" id="in-date" onchange="App.render()">
+                <label>Дата занятия</label>
+                <input type="date" id="in-date" onchange="App.handleDateChange()">
             </div>
             <div>
                 <label>Длительность</label>
                 <select id="in-duration" onchange="App.render()">
-                    <option value="15">15 мин</option>
                     <option value="30">30 мин</option>
                     <option value="45">45 мин</option>
                     <option value="60" selected>1 час</option>
@@ -70,22 +91,24 @@
             </div>
         </div>
 
-        <label>Доступное время (нажмите для выбора)</label>
+        <label style="margin-top:10px;">Выберите время начала:</label>
         <div id="time-grid" class="time-grid"></div>
         <div class="warning" id="time-warning"></div>
 
-        <button id="btn-book" class="btn btn-primary" onclick="App.book()" disabled>Забронировать время</button>
+        <button id="btn-book" class="btn btn-primary" onclick="App.book()" disabled style="margin-top:10px;">Забронировать</button>
 
+        <h3 style="margin-top:30px; margin-bottom:10px; font-size:18px;">Занятость на <span id="display-date"></span></h3>
         <table>
-            <thead><tr><th>Время</th><th>Ученик</th><th>Действие</th></tr></thead>
+            <thead><tr><th>Время</th><th>Кто записан</th><th>Управление</th></tr></thead>
             <tbody id="res-table"></tbody>
         </table>
         
-        <button onclick="App.logout()" style="margin-top:30px; width:100%; background:none; border:none; color:#94a3b8; font-size:12px; cursor:pointer;">Сменить пользователя</button>
+        <button onclick="App.logout()" style="margin-top:40px; width:100%; background:#f1f5f9; border:none; padding:12px; border-radius:10px; color:#64748b; font-size:14px; cursor:pointer;">Выйти из аккаунта</button>
     </div>
 </div>
 
 <script>
+// Конфигурация API
 const CFG = {
     BIN: '698f465fd0ea881f40b7d3e6',
     KEY: '$2a$10$A3hHJ1g7sjF5BuwT2drIKewRvsdMFx0iy8Jn6wpFPse5ciB.bR9n.',
@@ -99,84 +122,203 @@ const App = {
     selTime: null,
 
     async init() {
+        // Установка сегодняшней даты
         document.getElementById('in-date').valueAsDate = new Date();
-        if (this.user) this.showMain();
-        await this.sync();
-        setInterval(() => this.sync(), 20000); // Обновление раз в 20 сек
+        
+        if (this.user) {
+            this.showMain();
+            await this.sync(true); // Принудительная синхронизация при входе
+        }
+        
+        // Авто-обновление каждые 15 секунд
+        setInterval(() => this.sync(), 15000);
     },
 
-    async sync() {
+    // --- ЛОГИКА СИНХРОНИЗАЦИИ ---
+
+    async sync(showLoader = false) {
+        if (showLoader) this.toggleL(true);
         try {
-            // ИСПРАВЛЕНО: Убраны лишние пробелы в URL
             const res = await fetch(`https://api.jsonbin.io/v3/b/${CFG.BIN}/latest`, {
-                headers: { 'X-Master-Key': CFG.KEY, 'X-Bin-Meta': 'false' },
+                headers: { 'X-Master-Key': CFG.KEY, 'X-Bin-Meta': 'false' }, // Meta false отдает чистый JSON
                 cache: 'no-store'
             });
+            
+            if (!res.ok) throw new Error("Ошибка сети");
+
             const data = await res.json();
-            this.db = Array.isArray(data) ? data : [];
+            
+            // ВАЖНОЕ ИСПРАВЛЕНИЕ: JSONBin v3 иногда заворачивает данные в record, а иногда нет (зависит от настроек)
+            // Мы проверяем оба варианта
+            let freshDb = [];
+            if (Array.isArray(data)) {
+                freshDb = data;
+            } else if (data.record && Array.isArray(data.record)) {
+                freshDb = data.record;
+            } else {
+                freshDb = [];
+            }
+
+            this.db = freshDb;
+            
+            // Запуск очистки старых записей (Правило 5 часов)
+            this.cleanupOldBookings();
+            
             this.render();
-        } catch (e) { 
-            console.error("Ошибка синхронизации", e);
-            alert("Не удалось загрузить данные. Проверьте подключение.");
+        } catch (e) {
+            console.error(e);
+            if(showLoader) alert("Не удалось загрузить расписание. Проверьте интернет.");
+        }
+        if (showLoader) this.toggleL(false);
+    },
+
+    // --- ЛОГИКА ОЧИСТКИ (5 ЧАСОВ) ---
+    
+    async cleanupOldBookings() {
+        const now = new Date();
+        const initialCount = this.db.length;
+        
+        const validBookings = this.db.filter(booking => {
+            // Разбираем дату записи (YYYY-MM-DD)
+            const [y, m, d] = booking.d.split('-').map(Number);
+            
+            // Создаем объект даты окончания занятия
+            // Месяцы в JS начинаются с 0, поэтому m-1
+            const bookingEnd = new Date(y, m - 1, d, 0, booking.end); 
+            
+            // Добавляем 5 часов (5 * 60 * 60 * 1000 мс)
+            const vanishTime = new Date(bookingEnd.getTime() + (5 * 60 * 60 * 1000));
+            
+            // Оставляем запись, если время исчезновения еще не наступило
+            return now < vanishTime;
+        });
+
+        // Если что-то удалилось, сохраняем обновленную базу
+        if (validBookings.length < initialCount) {
+            console.log(`Удалено ${initialCount - validBookings.length} старых записей.`);
+            await this.save(validBookings);
         }
     },
 
+    // --- ЛОГИКА СОХРАНЕНИЯ ---
+
     async save(newDb) {
         this.toggleL(true);
-        document.getElementById('btn-book').disabled = true;
         try {
-            // ИСПРАВЛЕНО: Убраны лишние пробелы в URL
             const res = await fetch(`https://api.jsonbin.io/v3/b/${CFG.BIN}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'X-Master-Key': CFG.KEY },
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'X-Master-Key': CFG.KEY 
+                },
                 body: JSON.stringify(newDb)
             });
+            
             if (res.ok) {
                 this.db = newDb;
-                this.selTime = null;
-                await this.sync();
+                this.selTime = null; // Сброс выбора
+                // После успешного сохранения обновляем интерфейс
+                this.render(); 
             } else {
-                throw new Error("Ошибка сохранения на сервере");
+                throw new Error("Сервер отклонил сохранение");
             }
-        } catch (e) { 
-            alert("Ошибка сохранения: " + e.message); 
-            await this.sync(); // Восстанавливаем актуальное состояние
+        } catch (e) {
+            alert("Ошибка сохранения! Попробуйте еще раз.");
+            await this.sync(true); // Откат к серверной версии
         }
         this.toggleL(false);
     },
 
-    login() {
-        const n = document.getElementById('in-name').value.trim();
-        const warning = document.getElementById('login-warning');
+    // --- ЛОГИКА БРОНИРОВАНИЯ ---
+
+    async book() {
+        const date = document.getElementById('in-date').value;
+        const dur = parseInt(document.getElementById('in-duration').value);
         
-        if (!n) {
-            warning.style.display = 'block';
+        if (this.selTime === null) return;
+
+        const myStart = this.selTime;
+        const myEnd = this.selTime + dur;
+
+        // 1. Сначала скачиваем свежую версию, чтобы не было конфликтов
+        this.toggleL(true);
+        await this.sync(); 
+
+        // 2. Проверяем пересечения снова на свежей базе
+        const isConflict = this.db.some(x => 
+            x.d === date && 
+            (myStart < x.end && myEnd > x.start)
+        );
+
+        if (isConflict) {
+            this.toggleL(false);
+            alert("Упс! Пока вы думали, это время уже заняли. Выберите другое.");
+            this.selTime = null;
+            this.render();
             return;
         }
-        warning.style.display = 'none';
+
+        const newEntry = {
+            id: Date.now(),
+            d: date,
+            start: myStart,
+            end: myEnd,
+            u: this.user
+        };
+
+        await this.save([...this.db, newEntry]);
+    },
+
+    // --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
+
+    handleDateChange() {
+        this.selTime = null;
+        this.render();
+    },
+
+    deleteRow(id) {
+        if (!confirm('Вы уверены, что хотите отменить эту запись?')) return;
+        const newDb = this.db.filter(x => x.id !== id);
+        this.save(newDb);
+    },
+
+    clearAll() {
+        if (confirm('ВНИМАНИЕ: Это удалит АБСОЛЮТНО ВСЕ записи всех пользователей. Продолжить?')) {
+            this.save([]);
+        }
+    },
+
+    formatTime(minutes) {
+        let h = Math.floor(minutes / 60);
+        let m = minutes % 60;
+        if (h >= 24) h = h - 24; // Коррекция для ночного времени
+        return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+    },
+
+    login() {
+        const n = document.getElementById('in-name').value.trim();
+        if (!n) {
+            document.getElementById('login-warning').style.display = 'block';
+            return;
+        }
         
-        // Админ-режим только при явном вводе "admin" и правильном пароле
         if (n.toLowerCase() === 'admin') {
-            const pass = prompt('Введите пароль администратора:');
-            if (pass !== CFG.PASS) {
-                alert('Неверный пароль!');
-                return;
-            }
+            const pass = prompt('Пароль администратора:');
+            if (pass !== CFG.PASS) return alert('Неверно');
             this.isAdmin = true;
         } else {
-            // Обычный пользователь НИКОГДА не получает права админа
             this.isAdmin = false;
         }
         
         this.user = n;
         localStorage.setItem('u_name', n);
         localStorage.setItem('u_admin', this.isAdmin);
-        this.showMain();
+        this.init();
     },
 
-    logout() { 
-        localStorage.clear(); 
-        location.reload(); 
+    logout() {
+        localStorage.clear();
+        location.reload();
     },
 
     showMain() {
@@ -186,169 +328,99 @@ const App = {
         if (this.isAdmin) document.getElementById('admin-tools').style.display = 'block';
     },
 
-    async book() {
-        const date = document.getElementById('in-date').value;
-        const dur = parseInt(document.getElementById('in-duration').value);
-        const myStart = this.selTime;
-        const myEnd = this.selTime + dur;
-
-        // Синхронизируемся ПЕРЕД проверкой для актуальных данных
-        await this.sync();
-        
-        // ИСПРАВЛЕНА ЛОГИКА ПРОВЕРКИ ПЕРЕСЕЧЕНИЙ:
-        // Проверяем пересечение по формуле: 
-        // (новое_начало < существующий_конец) И (новый_конец > существующее_начало)
-        const isConflict = this.db.some(x => 
-            x.d === date && 
-            myStart < x.end && 
-            myEnd > x.start
-        );
-
-        if (isConflict) {
-            document.getElementById('time-warning').textContent = 
-                "⚠️ Это время пересекается с существующей записью. Выберите другой слот.";
-            document.getElementById('time-warning').style.display = 'block';
-            this.selTime = null;
-            this.render();
-            return;
-        }
-
-        // Дополнительная проверка: не выходит ли за пределы суток
-        if (myEnd > 1440) {
-            document.getElementById('time-warning').textContent = 
-                `⚠️ Выбранное время (${this.formatTime(myStart)}-${this.formatTime(myEnd)}) выходит за пределы суток. Уменьшите длительность.`;
-            document.getElementById('time-warning').style.display = 'block';
-            return;
-        }
-
-        const newEntry = { 
-            id: Date.now(), 
-            d: date, 
-            start: myStart, 
-            end: myEnd, 
-            u: this.user 
-        };
-        
-        document.getElementById('time-warning').style.display = 'none';
-        await this.save([...this.db, newEntry]);
+    toggleL(show) {
+        document.getElementById('loader').style.display = show ? 'flex' : 'none';
     },
 
-    deleteRow(id) {
-        if (!confirm('Удалить эту запись?')) return;
-        this.save(this.db.filter(x => x.id !== id));
-    },
-
-    clearAll() { 
-        if (confirm('УДАЛИТЬ ВСЕ ЗАПИСИ? Это действие нельзя отменить!')) 
-            this.save([]); 
-    },
-
-    formatTime(m) {
-        // ИСПРАВЛЕНО: Корректное форматирование для времён после 24:00
-        const totalMinutes = m % 1440;
-        const h = Math.floor(totalMinutes / 60);
-        const min = totalMinutes % 60;
-        return `${h.toString().padStart(2,'0')}:${min.toString().padStart(2,'0')}`;
-    },
+    // --- ОТРИСОВКА (RENDER) ---
 
     render() {
         const date = document.getElementById('in-date').value;
+        document.getElementById('display-date').textContent = date.split('-').reverse().join('.');
+        
         const dur = parseInt(document.getElementById('in-duration').value);
         const cont = document.getElementById('time-grid');
         const warning = document.getElementById('time-warning');
-        warning.style.display = 'none';
-        cont.innerHTML = '';
         
+        cont.innerHTML = '';
+        warning.style.display = 'none';
+
+        // Фильтруем занятые слоты на выбранную дату
         const dayBusy = this.db.filter(x => x.d === date);
-        let hasVisibleSlots = false;
 
-        // Генерируем слоты с шагом 15 минут
-        for (let m = 0; m < 1440; m += 15) {
+        let hasSlots = false;
+
+        // Генерация слотов с 09:00 (540 мин) до 22:00 (1320 мин) - можно менять
+        // Сейчас стоит с 00:00 до 24:00 с шагом 30 минут для компактности
+        for (let m = 0; m < 1440; m += 30) {
+            const myStart = m;
             const myEnd = m + dur;
-            const isOver = myEnd > 1440;
             
-            // ИСПРАВЛЕНА ЛОГИКА ПРОВЕРКИ ЗАНЯТОСТИ:
-            // Слот считается занятым, если:
-            // 1. Новая бронь пересекается с существующей (даже частично)
-            // 2. Время выходит за пределы суток
-            const isBusy = dayBusy.some(x => 
-                (m < x.end && (m + dur) > x.start)
-            ) || isOver;
+            // Если занятие выходит за пределы суток (24:00)
+            if (myEnd > 1440) continue;
 
-            const d = document.createElement('div');
-            d.className = `slot ${isBusy ? 'busy' : ''} ${this.selTime === m && !isBusy ? 'selected' : ''}`;
-            d.textContent = this.formatTime(m);
-            
+            // Проверка занятости
+            const isBusy = dayBusy.some(x => 
+                (myStart < x.end && myEnd > x.start)
+            );
+
+            const div = document.createElement('div');
+            div.className = `slot ${isBusy ? 'busy' : ''} ${this.selTime === m ? 'selected' : ''}`;
+            div.textContent = this.formatTime(m);
+
             if (!isBusy) {
-                hasVisibleSlots = true;
-                d.onclick = () => { 
-                    this.selTime = m; 
-                    warning.style.display = 'none';
-                    this.render(); 
+                hasSlots = true;
+                div.onclick = () => {
+                    this.selTime = m;
+                    this.render();
                 };
             }
-            
-            cont.appendChild(d);
+
+            cont.appendChild(div);
         }
-        
-        // ИСПРАВЛЕНО: Валидация выбранного слота при изменении параметров
-        if (this.selTime !== null) {
-            const currentEnd = this.selTime + dur;
-            const isCurrentOver = currentEnd > 1440;
-            const isCurrentBusy = dayBusy.some(x => 
-                this.selTime < x.end && currentEnd > x.start
-            );
-            
-            // Снимаем выделение если слот стал недоступен
-            if (isCurrentBusy || isCurrentOver) {
-                this.selTime = null;
-                warning.textContent = "⚠️ Ранее выбранный слот стал недоступен. Выберите новое время.";
-                warning.style.display = 'block';
-            }
-        }
-        
-        // Обновляем состояние кнопки
-        document.getElementById('btn-book').disabled = (this.selTime === null || !hasVisibleSlots);
-        
-        // Отображаем предупреждение если нет доступных слотов
-        if (!hasVisibleSlots) {
-            warning.textContent = "ℹ️ Нет доступных слотов на выбранную дату и длительность. Попробуйте изменить параметры.";
+
+        const btn = document.getElementById('btn-book');
+        btn.disabled = (this.selTime === null);
+        btn.textContent = this.selTime !== null 
+            ? `Забронировать ${this.formatTime(this.selTime)} - ${this.formatTime(this.selTime + dur)}`
+            : "Выберите время";
+
+        if (!hasSlots) {
+            warning.textContent = "На эту дату нет свободного времени (либо день прошел).";
             warning.style.display = 'block';
         }
 
-        // Рендерим таблицу записей
+        // Таблица записей
         const tbody = document.getElementById('res-table');
         tbody.innerHTML = '';
-        const list = dayBusy.sort((a,b) => a.start - b.start);
         
-        list.forEach(x => {
-            const canDel = this.isAdmin || x.u === this.user;
-            const tr = document.createElement('tr');
-            // ИСПРАВЛЕНО: Корректное отображение времени с использованием formatTime
-            tr.innerHTML = `
-                <td><b>${this.formatTime(x.start)}-${this.formatTime(x.end)}</b></td>
-                <td>${x.u}${x.u === this.user ? '<span class="my-badge">ВЫ</span>' : ''}</td>
-                <td>${canDel ? `<button class="del-btn" onclick="App.deleteRow(${x.id})">Удалить</button>` : '-'}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-        
-        if(!list.length) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#94a3b8; padding:20px;">Нет записей</td></tr>';
+        if (dayBusy.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px; color:#94a3b8;">Пока нет записей</td></tr>';
+        } else {
+            // Сортируем по времени
+            dayBusy.sort((a,b) => a.start - b.start).forEach(x => {
+                const isMe = x.u === this.user;
+                const canDel = this.isAdmin || isMe;
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <div style="font-weight:bold">${this.formatTime(x.start)} - ${this.formatTime(x.end)}</div>
+                    </td>
+                    <td>
+                        ${x.u} ${isMe ? '<span class="my-badge">ВЫ</span>' : ''}
+                    </td>
+                    <td>
+                        ${canDel ? `<button class="del-btn" onclick="App.deleteRow(${x.id})">Отмена</button>` : '<span style="color:#cbd5e1; font-size:12px">Нет прав</span>'}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
-    },
-
-    toggleL(s) { 
-        document.getElementById('loader').style.display = s ? 'flex' : 'none'; 
     }
 };
 
-// Гарантируем, что при первой загрузке показывается форма входа
-if (!localStorage.getItem('u_name')) {
-    document.getElementById('view-login').style.display = 'block';
-    document.getElementById('view-main').style.display = 'none';
-}
-
+// Старт приложения
 App.init();
 </script>
 </body>

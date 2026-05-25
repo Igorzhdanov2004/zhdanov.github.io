@@ -121,7 +121,7 @@ const App = {
             await this.sync(true);
         }
         // Авто-синхронизация каждые 12 секунд
-        setInterval(() => this.sync(false), 12000);
+        setInterval(() => this.sync(false), 60000);
     },
 
     // СИНХРОНИЗАЦИЯ С СЕРВЕРОМ
